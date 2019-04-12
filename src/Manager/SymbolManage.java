@@ -15,8 +15,11 @@ public class SymbolManage {
 
     private static SymbolManage manage = new SymbolManage();
 
+    private boolean isOpertionDrag = false;
+
     private ObservableList<MShape> selectedShape = FXCollections.observableArrayList();
 
+    private MShape leftPaneSelectd;
 
     private SymbolManage(){
     }
@@ -60,5 +63,25 @@ public class SymbolManage {
             mShape.hideOperationFrame();
         }
         getSelectedShape().clear();
+    }
+
+    public boolean isOpertionDrag() {
+        return isOpertionDrag;
+    }
+
+    public void setOpertionDrag(boolean opertionDrag) {
+        isOpertionDrag = opertionDrag;
+    }
+
+    public void setLeftPaneSelected(MShape mShape){
+        leftPaneSelectd = mShape;
+    }
+
+    public void cancelSelected(){
+        leftPaneSelectd = null;
+    }
+
+    public MShape getLeftPaneSelected(){
+        return leftPaneSelectd;
     }
 }

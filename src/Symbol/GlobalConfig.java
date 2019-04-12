@@ -3,7 +3,7 @@ package Symbol;
 import javafx.scene.paint.Color;
 
 public interface GlobalConfig {
-    public static final double CIRCLE_RADIUS = 3;
+    public static final double CIRCLE_RADIUS = 4;
 
     public static final Color OPERATION_FRAME_CIRCLE_COLOR = Color.rgb(0, 255, 255);
 

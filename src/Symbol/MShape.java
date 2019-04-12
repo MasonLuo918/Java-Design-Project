@@ -4,6 +4,8 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;
 
+import java.awt.*;
+
 public interface MShape {
     /**
      * 画出操作框
@@ -44,4 +46,20 @@ public interface MShape {
      * 获取在scene的bounds
      */
     public Bounds getBoundsInScene();
+
+    public boolean isLine();
+
+    public void drawOperationFrame();
+
+    public void setInitX(double initX);
+
+    public void setInitY(double initY);
+
+    public double getInitX();
+
+    public double getInitY();
+
+    public void setCursorPoint(Point2D cursorPoint);
+
+    public Point2D getCursorPoint();
 }

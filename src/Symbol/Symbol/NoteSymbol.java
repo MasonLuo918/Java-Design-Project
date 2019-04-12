@@ -1,34 +1,33 @@
-package Symbol;
+package Symbol.Symbol;
 
+import Symbol.GlobalConfig;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Polyline;
+import javafx.scene.shape.*;
 
-public class Diamond extends AbstractSymbol{
+public class NoteSymbol extends AbstractSymbol{
     @Override
     public void initMyShape() {
-        class DiamondShape extends Polygon {
-
+        class Shape extends Path{
             private SimpleDoubleProperty width = new SimpleDoubleProperty();
 
             private SimpleDoubleProperty height = new SimpleDoubleProperty();
 
-            public DiamondShape(){
-                width.bind(Diamond.this.widthProperty());
-                height.bind(Diamond.this.heightProperty());
+            private final double WID = 20;
+
+            public Shape() {
+                this.width.bind(NoteSymbol.this.prefWidthProperty());
+                this.height.bind(NoteSymbol.this.prefHeightProperty());
                 setFill(GlobalConfig.SYMBOL_FILL_COLOR);
                 setStroke(GlobalConfig.SYMBOL_STROKE_COLOR);
                 draw();
                 setListener();
             }
-
             public void setListener(){
                 widthProperty().addListener(new ChangeListener<Number>() {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                        getPoints().clear();
                         draw();
                     }
                 });
@@ -36,26 +35,42 @@ public class Diamond extends AbstractSymbol{
                 heightProperty().addListener(new ChangeListener<Number>() {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                        getPoints().clear();
                         draw();
                     }
                 });
             }
 
             public void draw(){
-                double x1 = getWidth() / 2;
-                double y1 = 0;
+                getElements().clear();
+                MoveTo moveTo = new MoveTo();
+                moveTo.setX(0.0);
+                moveTo.setY(0);
 
-                double x2 = getWidth();
-                double y2 = getHeight() / 2;
+                HLineTo hLineTo = new HLineTo();
+                hLineTo.setX(getWidth());
 
-                double x3 = getWidth() / 2;
-                double y3 = getHeight();
+                VLineTo vLineTo = new VLineTo();
+                vLineTo.setY(getHeight());
 
-                double x4 = 0;
-                double y4 = getHeight() / 2;
 
-                getPoints().addAll(x1, y1, x2, y2, x3, y3, x4, y4);
+                CubicCurveTo curveTo = new CubicCurveTo();
+                curveTo.setX(0.0);
+                curveTo.setY(getHeight() - 10);
+                curveTo.setControlX1((3.0 / 4) * getWidth());
+                curveTo.setControlY1(getHeight() - WID);
+                curveTo.setControlX2((1.0 / 4) * getWidth());
+                curveTo.setControlY2(getHeight() + WID);
+
+
+                VLineTo vLineTo2 = new VLineTo();
+                vLineTo2.setY(0);
+
+                getElements().add(moveTo);
+                getElements().add(hLineTo);
+                getElements().add(vLineTo);
+                getElements().add(curveTo);
+                getElements().add(vLineTo2);
+
             }
 
             public double getWidth() {
@@ -82,8 +97,6 @@ public class Diamond extends AbstractSymbol{
                 this.height.set(height);
             }
         }
-
-        DiamondShape diamond = new DiamondShape();
-        setMyShape(diamond);
+        setMyShape(new Shape());
     }
 }
