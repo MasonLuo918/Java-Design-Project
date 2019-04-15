@@ -18,7 +18,7 @@ public interface MShape {
     public void hideOperationFrame();
 
     /**
-     * 选中该Symbol
+     * 选中该Symbol,event检测是否按下ctrl
      */
     public void select(MouseEvent event);
 

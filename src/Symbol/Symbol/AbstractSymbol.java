@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -66,7 +67,10 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         for(int i = 0; i < circles.length; i++){
             circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
             circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
+            circles[i].setCursor(Cursor.E_RESIZE);
         }
+        //更改旋转圆手势
+        circles[0].setCursor(Cursor.HAND);
         for(int i = 0; i < connectCircle.length; i++){
             connectCircle[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
             connectCircle[i].setFill(GlobalConfig.CONNECT_CIRCLE_COLOR);
@@ -182,6 +186,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                     setPrefHeight(oldValue.doubleValue());
                 }
                 drawOperationFrame();
+                drawConnectCircle();
             }
         });
 
@@ -192,6 +197,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                     setPrefWidth(oldValue.doubleValue());
                 }
                 drawOperationFrame();
+                drawConnectCircle();
             }
         });
     }
@@ -280,14 +286,40 @@ public abstract class AbstractSymbol extends Pane implements MShape {
 
     @Override
     public boolean containsPointInScene(double x, double y) {
+        boolean inOperationFrame = false;
+        for(Circle circle:circles){
+            Bounds circleBoundsInLocal = circle.getBoundsInLocal();
+            Bounds circleBoundsInScene = circle.localToScene(circleBoundsInLocal);
+            if(circleBoundsInScene.contains(x, y)){
+                inOperationFrame = true;
+                break;
+            }
+        }
         Bounds bounds = getBoundsInScene();
-        if(bounds.contains(x,y)){
+        if(bounds.contains(x,y) && !inOperationFrame){
             return true;
         }else{
             return false;
         }
     }
 
+    /**
+     * 判断线是否进入范围内
+     * @param x
+     * @param y
+     * @return
+     */
+    public boolean isLineInner(double x, double y) {
+        double minX= getLayoutX() + getTranslateX() - GlobalConfig.ENTER_WIDTH;
+        double minY = getLayoutY() + getTranslateY() - GlobalConfig.ENTER_WIDTH;
+        double maxX = getLayoutX() + getTranslateX() + getPrefWidth() + GlobalConfig.ENTER_WIDTH;
+        double maxY = getLayoutY() + getTranslateY()  + getPrefHeight() + GlobalConfig.ENTER_WIDTH;
+        if(minX < x && minY < y && maxX > x && maxY > y){
+            return true;
+        }else{
+            return false;
+        }
+    }
     @Override
     public Point2D sceneToParent(double x,double y){
         Point2D toLocal = sceneToLocal(x, y);
@@ -350,5 +382,35 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     @Override
     public void setCursorPoint(Point2D cursorPoint) {
         this.cursorPoint = cursorPoint;
+    }
+
+    public void showConnectCircle(){
+        hideConnectCircle();
+        drawConnectCircle();
+        for(Circle circle:connectCircle){
+            getChildren().add(circle);
+        }
+    }
+
+    public void hideConnectCircle(){
+        for(Circle circle:connectCircle){
+            getChildren().remove(circle);
+        }
+    }
+
+    public void drawConnectCircle(){
+
+        connectCircle[0].setCenterX(getPrefWidth() / 2);
+        connectCircle[0].setCenterY(0);
+
+        connectCircle[1].setCenterX(getPrefWidth());
+        connectCircle[1].setCenterY(getPrefHeight() / 2);
+
+        connectCircle[2].setCenterX(getPrefWidth() / 2);
+        connectCircle[2].setCenterY(getPrefHeight());
+
+        connectCircle[3].setCenterX(0);
+        connectCircle[3].setCenterY(getPrefHeight() / 2);
+
     }
 }

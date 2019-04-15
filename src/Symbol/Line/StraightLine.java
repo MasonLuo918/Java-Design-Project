@@ -1,6 +1,7 @@
 package Symbol.Line;
 
 import Manager.SymbolManage;
+import MathUtil.MathUtil;
 import Symbol.GlobalConfig;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -8,10 +9,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import sun.security.action.GetLongAction;
 
 /**
  *  使用前必须先setDrawPane
@@ -24,18 +27,15 @@ public class StraightLine extends AbstractLine {
         setDrawPane(drawPane);
         setLineType(LineType.STRAIGHT_LINE);
         setStrokeWidth(2);
+        setFill(null);
         for(int i = 0; i < circles.length; i++){
             circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
             circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
         }
-        startX.set((getDrawPane().getWidth() - getInitLineLenght()) / 2);
+        startX.set((getDrawPane().getWidth() - getLineLength()) / 2);
         startY.set(getDrawPane().getHeight() / 2);
-        endX.set((getDrawPane().getWidth() + getInitLineLenght()) / 2);
+        endX.set((getDrawPane().getWidth() + getLineLength()) / 2);
         endY.set(getDrawPane().getHeight() / 2);
-//        circles[0].centerXProperty().bind(startX);
-//        circles[0].centerYProperty().bind(startY);
-//        circles[1].centerYProperty().bind(endY);
-//        circles[1].centerXProperty().bind(endX);
         updateLine();
         drawOperationFrame();
         initEvent();
@@ -130,24 +130,38 @@ public class StraightLine extends AbstractLine {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 endX.set(MouseInParent.getX());
                 endY.set(MouseInParent.getY());
+                SymbolManage.getManage().detect(circles[1].getCenterX(), circles[1].getCenterY());
             }
         });
+
+        for(Circle circle:circles){
+            circle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    circle.setCursor(Cursor.E_RESIZE);
+                }
+            });
+        }
     }
 
-    @Override
-    public Point2D sceneToParent(double x, double y) {
-        Point2D toLocal = sceneToLocal(x,y);
-        return toLocal;
-    }
+
 
     @Override
     public boolean containsPointInScene(double x, double y) {
-        return getBoundsInScene().contains(x,y);
-    }
-
-    @Override
-    public Bounds getBoundsInScene() {
-        return localToScene(getBoundsInLocal());
+        boolean inOperationCircle = false;
+        for(Circle circle: circles){
+            Bounds toLocal = circle.getBoundsInLocal();
+            Bounds toScene = circle.localToScene(toLocal);
+            if(toScene.contains(x, y)){
+                inOperationCircle = true;
+                break;
+            }
+        }
+        if(!inOperationCircle){
+            return getBoundsInScene().contains(x,y);
+        }else{
+            return false;
+        }
     }
 
     @Override
@@ -160,12 +174,25 @@ public class StraightLine extends AbstractLine {
 
     @Override
     public void updateLine() {
-        double x1 = startX.get();
-        double y1 = startY.get();
-        double x2 = endX.get();
-        double y2 = endY.get();
+
+        /**
+         * 更新线段，带箭头
+         */
+        double x1 = getStartX();
+        double y1 = getStartY();
+        double arc = MathUtil.getArcOfX(getStartX(), getStartY(), getEndX(), getEndY());
+        double height = GlobalConfig.ARROW_LENGTH * (Math.sqrt(3) / 2);
+        double x2 = getEndX() - height * Math.cos(arc);
+        double y2 = getEndY() + height * Math.sin(arc);
+        double x3 = x2 - GlobalConfig.ARROW_LENGTH / 2 * Math.sin(arc);
+        double y3 = y2 - GlobalConfig.ARROW_LENGTH / 2 * Math.cos(arc);
+        double x4 = getEndX();
+        double y4 = getEndY();
+        double x5 = x2 + GlobalConfig.ARROW_LENGTH / 2 * Math.sin(arc);
+        double y5 = y2 + GlobalConfig.ARROW_LENGTH / 2 * Math.cos(arc);
         getPoints().clear();
-        getPoints().addAll(x1, y1, x2, y2);
+        getPoints().addAll(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x2, y2);
+
     }
 
     @Override

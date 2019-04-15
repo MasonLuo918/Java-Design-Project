@@ -18,10 +18,21 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     private double initY;
 
+    private double lastStartX;
+
+    private double lastStartY;
+
+    private double lastMiddleX;
+
+    private double lastMiddleY;
+
+    private double lastEndX;
+
+    private double lastEndY;
+
     private Point2D cursorPoint;
 
-    private double initLineLenght = 100;
-
+    private double lineLength = 100;
 
     SimpleDoubleProperty startX = new SimpleDoubleProperty();
 
@@ -34,6 +45,7 @@ public abstract class AbstractLine extends Polyline implements MShape {
     SimpleDoubleProperty middleX = new SimpleDoubleProperty();
 
     SimpleDoubleProperty middleY = new SimpleDoubleProperty();
+
 
 
     public Pane getDrawPane() {
@@ -57,12 +69,12 @@ public abstract class AbstractLine extends Polyline implements MShape {
         return true;
     }
 
-    public double getInitLineLenght() {
-        return initLineLenght;
+    public double getLineLength() {
+        return lineLength;
     }
 
-    public void setInitLineLenght(double initLineLenght) {
-        this.initLineLenght = initLineLenght;
+    public void setLineLength(double lineLength) {
+        this.lineLength = lineLength;
     }
 
     public abstract void updateLine();
@@ -95,6 +107,17 @@ public abstract class AbstractLine extends Polyline implements MShape {
     @Override
     public void setCursorPoint(Point2D cursorPoint) {
         this.cursorPoint = cursorPoint;
+    }
+
+    @Override
+    public Bounds getBoundsInScene() {
+        return localToScene(getBoundsInLocal());
+    }
+
+    @Override
+    public Point2D sceneToParent(double x, double y) {
+        Point2D toLocal = sceneToLocal(x,y);
+        return toLocal;
     }
 
     public double getStartX() {
@@ -167,5 +190,53 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     public void setMiddleY(double middleY) {
         this.middleY.set(middleY);
+    }
+
+    public double getLastStartX() {
+        return lastStartX;
+    }
+
+    public void setLastStartX(double lastStartX) {
+        this.lastStartX = lastStartX;
+    }
+
+    public double getLastStartY() {
+        return lastStartY;
+    }
+
+    public void setLastStartY(double lastStartY) {
+        this.lastStartY = lastStartY;
+    }
+
+    public double getLastEndX() {
+        return lastEndX;
+    }
+
+    public void setLastEndX(double lastEndX) {
+        this.lastEndX = lastEndX;
+    }
+
+    public double getLastEndY() {
+        return lastEndY;
+    }
+
+    public void setLastEndY(double lastEndY) {
+        this.lastEndY = lastEndY;
+    }
+
+    public double getLastMiddleX() {
+        return lastMiddleX;
+    }
+
+    public void setLastMiddleX(double lastMiddleX) {
+        this.lastMiddleX = lastMiddleX;
+    }
+
+    public double getLastMiddleY() {
+        return lastMiddleY;
+    }
+
+    public void setLastMiddleY(double lastMiddleY) {
+        this.lastMiddleY = lastMiddleY;
     }
 }

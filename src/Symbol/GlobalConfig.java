@@ -9,7 +9,7 @@ public interface GlobalConfig {
 
     public static final Color OPERATION_FRAME_LINE_COLOR = Color.rgb(0, 255, 255);
 
-    public static final Color CONNECT_CIRCLE_COLOR = Color.BLUE;
+    public static final Color CONNECT_CIRCLE_COLOR = Color.GREEN;
 
     public static final Color SYMBOL_FILL_COLOR = Color.WHITE;
 
@@ -30,6 +30,8 @@ public interface GlobalConfig {
     public static final double MAX_PANE_HEIGHT = 200;
 
     public static final double ENTER_WIDTH = 50; // 当线进入边界50左右就显示连接圆
+
+    public static final double ARROW_LENGTH = 10;
 
     /*
      *  连接操作线和旋转圆的线的长度

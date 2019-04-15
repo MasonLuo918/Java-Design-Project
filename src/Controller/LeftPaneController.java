@@ -3,6 +3,7 @@ package Controller;
 import Main.MainApp;
 import Manager.SymbolManage;
 import Symbol.*;
+import Symbol.Line.BrokenLine;
 import Symbol.Line.StraightLine;
 import Symbol.Symbol.*;
 import javafx.event.EventHandler;
@@ -42,11 +43,14 @@ public class LeftPaneController extends Controller {
 
     @Override
     public void init() {
-        leftPane.setFitToWidth(true);
+        leftPane.setFitToWidth(true); //取消自动填充子节点
         VBox vbox = new VBox(40);
         vbox.setPadding(new Insets(30, 5, 30, 5));
         vbox.setFillWidth(false);
         vbox.setAlignment(Pos.CENTER);
+        /**
+         * 新建所有symbol
+         */
         ArcRectangle arcRectangle = new ArcRectangle();
         ConnetSymbol connetSymbol = new ConnetSymbol();
         Diamond diamond = new Diamond();
@@ -55,7 +59,7 @@ public class LeftPaneController extends Controller {
         Rectangle rectangle = new Rectangle();
 
         /**
-         * 形状
+         * 设置鼠标点击事件
          */
         arcRectangle.setOnMouseClicked(new leftPaneEvent());
         connetSymbol.setOnMouseClicked(new leftPaneEvent());
@@ -64,8 +68,8 @@ public class LeftPaneController extends Controller {
         noteSymbol.setOnMouseClicked(new leftPaneEvent());
         rectangle.setOnMouseClicked(new leftPaneEvent());
         vbox.getChildren().addAll(arcRectangle, rectangle, diamond, ioFrame, connetSymbol, noteSymbol);
-
         StraightLine straightLine = new StraightLine(vbox);
+        BrokenLine brokenLine = new BrokenLine(vbox);
 
         /**
          * 添加线条的事件
@@ -73,19 +77,48 @@ public class LeftPaneController extends Controller {
         straightLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                /**
+                 * 如果只是单击一次，就添加至选中
+                 */
                 if(event.getClickCount() == 1){
                     SymbolManage.getManage().cancelSelected();
                     StraightLine newLine = new StraightLine(getMainApp().getRightPane());
                     getMainApp().getRightPane().getChildren().remove(newLine);
                     SymbolManage.getManage().setLeftPaneSelected(newLine);
                 }
-
+                /**
+                 * 单击两次，直接添加到rightPane中间
+                 */
                 if(event.getClickCount() == 2){
                     StraightLine line = new StraightLine(getMainApp().getRightPane());
                     SymbolManage.getManage().cancelSelected();
                 }
             }
         });
+
+
+        brokenLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                /**
+                 * 如果只是单击一次，就添加至选中
+                 */
+                if(event.getClickCount() == 1){
+                    SymbolManage.getManage().cancelSelected();
+                    BrokenLine newLine = new BrokenLine(getMainApp().getRightPane());
+                    getMainApp().getRightPane().getChildren().remove(newLine);
+                    SymbolManage.getManage().setLeftPaneSelected(newLine);
+                }
+                /**
+                 * 单击两次，直接添加到rightPane中间
+                 */
+                if(event.getClickCount() == 2){
+                    BrokenLine line = new BrokenLine(getMainApp().getRightPane());
+                    SymbolManage.getManage().cancelSelected();
+                }
+            }
+        });
+
         leftPane.setContent(vbox);
     }
 
@@ -99,6 +132,9 @@ public class LeftPaneController extends Controller {
 
             MShape mShape;
             String className = event.getSource().getClass().getName();
+            /**
+             * 单击一次，根据反射机制新建symbol，添加为选中
+             */
             try{
                 Class<?> clz = Class.forName(className);
                 mShape = (MShape)clz.newInstance();
@@ -106,6 +142,9 @@ public class LeftPaneController extends Controller {
                     SymbolManage.getManage().cancelSelected();
                     SymbolManage.getManage().setLeftPaneSelected(mShape);
                 }
+                /**
+                 * 单击两次，直接添加到rightPane中间
+                 */
                 if(event.getClickCount() == 2){
                     addToRightPane(mShape);
                     SymbolManage.getManage().cancelSelected();
@@ -114,6 +153,10 @@ public class LeftPaneController extends Controller {
         }
     }
 
+    /**
+     * 添加symbol到rightPane
+     * @param mshape
+     */
     public void addToRightPane(MShape mshape){
         Pane rightPane = mainApp.getRightPane();
         rightPane.getChildren().add((Node)mshape);

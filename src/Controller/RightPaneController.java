@@ -39,10 +39,14 @@ public class RightPaneController extends Controller {
 
     @Override
     public void init() {
+        /**
+         * 初始化右边绘图pane的点击事件，当鼠标按下是，判断是否是在图形里面按下，
+         * 如果是，就选中该图形，如果不是，取消所有选中
+         */
         rightPane.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                boolean inMyshape = false;
+                boolean inMyShape = false; //标志位，判断是否在shape里面点击
                 try {
                     for (Node node : rightPane.getChildren()) {
                         /*
@@ -51,52 +55,82 @@ public class RightPaneController extends Controller {
                         MShape mShape = (MShape) node;
                         if (mShape.containsPointInScene(event.getSceneX(), event.getSceneY())) {
                             mShape.select(event);
-                            inMyshape = true;
+                            inMyShape = true;
                         }
-                        /**
-                         * 如果不是线条，记录下现在的鼠标的点等，以便拖拽使用
+                        /*
+                         * 将鼠标的坐标系转换成在rightPane的坐标系，并记录下当前鼠标的位置，以便拖拽使用
                          */
-                        mShape.setInitX(node.getTranslateX());
-                        mShape.setInitY(node.getTranslateY());
                         mShape.setCursorPoint(mShape.sceneToParent(event.getSceneX(), event.getSceneY()));
+                        /*
+                         * 如果不是一条线，记录下初始symbol左上角的坐标
+                         */
+                        if (!mShape.isLine()) {
+                            mShape.setInitX(node.getTranslateX());
+                            mShape.setInitY(node.getTranslateY());
+                            /**
+                             * 如果是一条线的话，记录线的各个点的坐标
+                             */
+                        }else{
+                            AbstractLine line = (AbstractLine) mShape;
+                            line.setLastStartX(line.getStartX());
+                            line.setLastStartY(line.getStartY());
+                            line.setLastEndX(line.getEndX());
+                            line.setLastEndY(line.getEndY());
+                            line.setLastMiddleX(line.getMiddleX());
+                            line.setLastMiddleY(line.getMiddleY());
+                        }
                     }
                 } catch (Exception e) {
                 }
-                if (!inMyshape) {
-                    SymbolManage.getManage().removeAll();
-                    Point2D point2D = rightPane.sceneToLocal(event.getSceneX(), event.getSceneY());
+                /**
+                 * 如果不是在shape里面点击，则判断两个事情
+                 * 1、是否在左边面板里面选择了一个图形,如果是，则添加选中的图形到左边的面板
+                 * 2、如果1不成立，取消所有选中
+                 */
+                if (!inMyShape) {
+                    SymbolManage.getManage().removeAll(); //取消所有的选中
+                    Point2D point2D = rightPane.sceneToLocal(event.getSceneX(), event.getSceneY()); //转换坐标系
                     try {
+                        /**
+                         * 如果1成立，则执行
+                         */
                         if (SymbolManage.getManage().getLeftPaneSelected() != null) {
                             MShape mShape = SymbolManage.getManage().getLeftPaneSelected();
                             rightPane.getChildren().add((Node) mShape);
                             if (!mShape.isLine()) {
+                                /**
+                                 * 新建一个symbol，并根据鼠标点击的位置设置位置
+                                 */
                                 AbstractSymbol symbol = (AbstractSymbol) mShape;
                                 symbol.setLayoutX(point2D.getX() - symbol.getPrefWidth() / 2);
                                 symbol.setLayoutY(point2D.getY() - symbol.getPrefHeight() / 2);
                             } else {
                                 /**
-                                 * 点击右边面板时，新建线条
+                                 * 点击右边面板时，新建线条,并且根据鼠标点击的位置设置位置
                                  */
                                 AbstractLine line = (AbstractLine) mShape;
                                 int lineType = line.getLineType();
                                 switch (lineType) {
                                     case LineType.STRAIGHT_LINE:
-                                        line.setStartX(point2D.getX() - line.getInitLineLenght() / 2);
+                                        line.setStartX(point2D.getX() - line.getLineLength() / 2);
                                         line.setStartY(point2D.getY());
-                                        line.setEndX(line.getStartX() + line.getInitLineLenght());
+                                        line.setEndX(line.getStartX() + line.getLineLength());
                                         line.setEndY(line.getStartY());
                                         break;
                                     case LineType.BROKEN_LINE:
-                                        line.setStartX(point2D.getX() - line.getInitLineLenght() / 2);
+                                        line.setStartX(point2D.getX() - line.getLineLength() / 2);
                                         line.setStartY(point2D.getY());
-                                        line.setMiddleX(line.getStartX() + line.getInitLineLenght());
-                                        line.setMiddleY(line.getStartY());
+                                        line.setMiddleX(point2D.getX() + line.getLineLength() / 2);
+                                        line.setMiddleY(point2D.getY());
                                         line.setEndX(line.getMiddleX());
-                                        line.setEndY(line.getMiddleY() + line.getInitLineLenght());
-
+                                        line.setEndY(line.getMiddleY() + line.getLineLength());
+                                        break;
                                 }
                             }
 
+                            /**
+                             * 添加完毕，取消左边面板的选中
+                             */
                             SymbolManage.getManage().cancelSelected();
                         }
                     } catch (Exception e) {
@@ -117,12 +151,12 @@ public class RightPaneController extends Controller {
                     return;
                 }
                 Point2D eventPointInScene = rightPane.sceneToLocal(event.getSceneX(), event.getSceneY());
-                for (MShape myshape : SymbolManage.getManage().getSelectedShape()) {
 
-                    if (!myshape.isLine()) {
-                        AbstractSymbol symbol = (AbstractSymbol) myshape;
-                        double dragX = eventPointInScene.getX() - symbol.getCursorPoint().getX();
-                        double dragY = eventPointInScene.getY() - symbol.getCursorPoint().getY();
+                for (MShape myShape : SymbolManage.getManage().getSelectedShape()) {
+                    double dragX = eventPointInScene.getX() - myShape.getCursorPoint().getX();
+                    double dragY = eventPointInScene.getY() - myShape.getCursorPoint().getY();
+                    if (!myShape.isLine()) {
+                        AbstractSymbol symbol = (AbstractSymbol) myShape;
                         double newPositionX = symbol.getInitX() + dragX;
                         double newPositionY = symbol.getInitY() + dragY;
                         if (!(symbol.getLayoutX() + newPositionX < 0 || symbol.getLayoutX() + newPositionX + symbol.getPrefWidth() > rightPane.getWidth())) {
@@ -132,12 +166,23 @@ public class RightPaneController extends Controller {
                         if (!(symbol.getLayoutY() + newPositionY < 0 || symbol.getLayoutY() + newPositionY + symbol.getPrefHeight() > rightPane.getHeight())) {
                             symbol.setTranslateY(newPositionY);
                         }
+                    } else {
+                        AbstractLine line = (AbstractLine) myShape;
+                        double newStartX = line.getLastStartX() + dragX;
+                        double newStartY = line.getLastStartY() + dragY;
+                        double newEndX = line.getLastEndX() + dragX;
+                        double newEndY = line.getLastEndY() + dragY;
+                        double newMiddleX = line.getLastMiddleX() + dragX;
+                        double newMiddleY = line.getLastMiddleY() + dragY;
+                        line.setStartX(newStartX);
+                        line.setStartY(newStartY);
+                        line.setMiddleX(newMiddleX);
+                        line.setMiddleY(newMiddleY);
+                        line.setEndX(newEndX);
+                        line.setEndY(newEndY);
                     }
-
-
                 }
             }
         });
     }
-
 }

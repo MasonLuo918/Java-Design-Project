@@ -17,12 +17,16 @@ public class MainAppController extends Controller {
         this.mainApp = mainApp;
     }
 
+
+    /**
+     * 初始化左右面板控制器
+     */
     @Override
     public void init(){
         leftPaneController = LeftPaneController.getLeftPaneController();
         rightPaneController = rightPaneController.getRightPaneController();
         leftPaneController.setLeftPane(mainApp.getLeftPane());
-        leftPaneController.setMainApp(mainApp);
+        leftPaneController.setMainApp(mainApp); //设置mainApp，以便获取数据
         rightPaneController.setRightPane(mainApp.getRightPane());
         leftPaneController.init();
         rightPaneController.init();

@@ -1,6 +1,7 @@
 package Main;
 
 import Controller.MainAppController;
+import Manager.SymbolManage;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -35,6 +36,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         initLayout();
+        SymbolManage.getManage().setMainApp(this); //连接Manage和MainApp
         initController();
         primaryStage.setScene(new Scene(rootLayout, 900, 600));
         primaryStage.show();
