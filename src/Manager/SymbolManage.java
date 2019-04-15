@@ -20,7 +20,7 @@ public class SymbolManage {
     private static SymbolManage manage = new SymbolManage();
 
     private boolean isOpertionDrag = false;
-    
+
     private ObservableList<MShape> selectedShape = FXCollections.observableArrayList();
 
     private ObservableList<MShape> connectShape = FXCollections.observableArrayList();
@@ -116,6 +116,9 @@ public class SymbolManage {
     public void detect(double x, double y){
         Pane rightPane = mainApp.getRightPane();
         for(Node node:rightPane.getChildren()){
+            if(!(node instanceof MShape)){
+                continue;
+            }
             MShape m = (MShape) node;
             if(m.isLine()){
                 continue;
