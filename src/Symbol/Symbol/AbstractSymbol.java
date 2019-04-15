@@ -273,12 +273,18 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 double dragY = mousePointInParent.getY() - cursorPoint.getY();
                 double newPositionX = (initX + dragX) ;
                 double newPositionY = (initY + dragY);
+                double oldWidth = getPrefWidth();
+                double oldHeight = getPrefHeight();
                 double addWidth = (getTranslateX() - newPositionX);
                 double addHeight = (getTranslateY() - newPositionY);
                 setPrefWidth(getPrefWidth() + addWidth);
+                if(getPrefWidth() != oldWidth){
+                    setTranslateX(newPositionX);
+                }
                 setPrefHeight(getPrefHeight() + addHeight);
-                setTranslateX(newPositionX);
-                setTranslateY(newPositionY);
+                if(getPrefHeight() != oldHeight){
+                    setTranslateY(newPositionY);
+                }
             }
         });
 
