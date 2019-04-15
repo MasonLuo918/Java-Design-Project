@@ -30,4 +30,19 @@ public class ConnetSymbol extends AbstractSymbol{
     public void hideOperationFrame(){
 
     }
+
+    /**
+     * 取消连接框
+     */
+    @Override
+    public void showConnectCircle() {
+    }
+
+    @Override
+    public void hideConnectCircle() {
+    }
+
+    @Override
+    public void drawConnectCircle() {
+    }
 }
