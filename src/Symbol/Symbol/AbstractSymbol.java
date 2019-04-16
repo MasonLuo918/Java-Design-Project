@@ -8,8 +8,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.input.MouseDragEvent;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -17,8 +19,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import MathUtil.MathUtil;
-
-import java.awt.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 
 public abstract class AbstractSymbol extends Pane implements MShape {
@@ -39,6 +41,9 @@ public abstract class AbstractSymbol extends Pane implements MShape {
      */
     private Line[] lines = new Line[5];
 
+    private TextArea textArea = new TextArea();
+
+    private Text text = new Text("");
 
     /*
      * 设置Symbol
@@ -52,15 +57,20 @@ public abstract class AbstractSymbol extends Pane implements MShape {
 
     private double initY;
 
+    /**
+     * text 在一行的情况下的高
+     */
+    private double textHeight = 0;
+
     private Point2D cursorPoint;
 
     public AbstractSymbol() {
         init();
     }
 
-
     public void init() {
-        setPrefSize(GlobalConfig.PANE_WIDTH, GlobalConfig.PANE_HEGHT);
+        setPrefSize(GlobalConfig.PANE_WIDTH, GlobalConfig.PANE_HEIGHT);
+        initTextHeight();
         /*
          * 给操作框对象分配内存空间
          */
@@ -80,10 +90,14 @@ public abstract class AbstractSymbol extends Pane implements MShape {
             lines[i].setStroke(GlobalConfig.OPERATION_FRAME_LINE_COLOR);
             lines[i].getStrokeDashArray().add(3.0);
         }
+        text.setFont(GlobalConfig.FONT);
+        textArea.setFont(GlobalConfig.FONT);
+        text.textProperty().bindBidirectional(textArea.textProperty());
+        setTextListenerEvent();
         initMyShape();
         initEvent();
         initOperationFrameEvent();
-        getChildren().addAll(myShape);
+        getChildren().addAll(myShape,text);
     }
 
 
@@ -186,6 +200,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 }
                 drawOperationFrame();
                 drawConnectCircle();
+                updateText();
             }
         });
 
@@ -197,8 +212,10 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 }
                 drawOperationFrame();
                 drawConnectCircle();
+                updateText();
             }
         });
+
     }
 
     @Override
@@ -213,7 +230,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 @Override
                 public void handle(MouseEvent event) {
                     SymbolManage symbolManage = SymbolManage.getManage();
-                    symbolManage.setOpertionDrag(true);
+                    symbolManage.setOperationDrag(true);
                     setInitX(getTranslateX());
                     setInitY(getTranslateY());
                     setCursorPoint(sceneToParent(event.getSceneX(), event.getSceneY()));
@@ -224,7 +241,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 @Override
                 public void handle(MouseEvent event) {
                     SymbolManage symbolManage = SymbolManage.getManage();
-                    symbolManage.setOpertionDrag(false);
+                    symbolManage.setOperationDrag(false);
                 }
             });
             circle.setOnMouseEntered(new EventHandler<MouseEvent>() {
@@ -246,7 +263,6 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 Point2D eventCoorRelativeToParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 double shapeCenterX = getPrefWidth() / 2 + getLayoutX() + getTranslateX();
                 double shapeCenterY = getPrefHeight() / 2 + getLayoutY() + getTranslateY();
-                System.out.println(getLayoutX() + " " + getLayoutY());
                 double ax = 0;
                 double ay = shapeCenterY - getLayoutY();
                 double bx = eventCoorRelativeToParent.getX() - shapeCenterX;
@@ -371,6 +387,12 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 }
             }
         });
+    }
+
+    public void initTextHeight(){
+        Text text = new Text("Hello World");
+        text.setFont(GlobalConfig.FONT);
+        setTextHeight(text.getBoundsInLocal().getHeight());
     }
 
     @Override
@@ -502,6 +524,79 @@ public abstract class AbstractSymbol extends Pane implements MShape {
 
         connectCircle[3].setCenterX(0);
         connectCircle[3].setCenterY(getPrefHeight() / 2);
+    }
 
+    @Override
+    public void showTextArea(){
+        textArea.setPrefHeight(getPrefHeight());
+        textArea.setPrefWidth(getPrefWidth());
+        textArea.setWrapText(true);
+        if(!getChildren().contains(textArea)){
+            getChildren().addAll(textArea);
+        }
+    }
+
+    @Override
+    public void hideTextArea(){
+        if(getChildren().contains(textArea)){
+            getChildren().remove(textArea);
+        }
+    }
+
+    @Override
+    public void setTextListenerEvent(){
+        textArea.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if(text.getBoundsInLocal().getHeight() > getPrefHeight() - getTextHeight()){
+                    text.setText(oldValue);
+                }
+                updateText();
+            }
+        });
+    }
+
+    /**
+     * 更新文本的位置
+     */
+    @Override
+    public void updateText() {
+        text.setWrappingWidth(getPrefWidth());
+        text.setTextAlignment(TextAlignment.CENTER);
+        Bounds bounds = text.getBoundsInParent();
+        double y = getPrefHeight() - bounds.getHeight();
+        text.setY(y / 2 + getTextHeight());
+    }
+
+    public Circle[] getConnectCircle() {
+        return connectCircle;
+    }
+
+    public void setConnectCircle(Circle[] connectCircle) {
+        this.connectCircle = connectCircle;
+    }
+
+    public TextArea getTextArea() {
+        return textArea;
+    }
+
+    public void setTextArea(TextArea textArea) {
+        this.textArea = textArea;
+    }
+
+    public Text getText() {
+        return text;
+    }
+
+    public void setText(Text text) {
+        this.text = text;
+    }
+
+    public double getTextHeight() {
+        return textHeight;
+    }
+
+    public void setTextHeight(double textHeight) {
+        this.textHeight = textHeight;
     }
 }

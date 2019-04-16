@@ -5,7 +5,11 @@ import Symbol.GlobalConfig;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.scene.control.TextArea;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 public class IOFrame extends AbstractSymbol {
 
@@ -13,7 +17,7 @@ public class IOFrame extends AbstractSymbol {
     public void initMyShape() {
         class Shape extends Polygon {
 
-            private double offset = 30;
+            private double offset = GlobalConfig.IOFRAME_OFFSET;
             private SimpleDoubleProperty width = new SimpleDoubleProperty();
 
             private SimpleDoubleProperty height = new SimpleDoubleProperty();
@@ -82,5 +86,30 @@ public class IOFrame extends AbstractSymbol {
         }
         Shape shape = new Shape();
         setMyShape(shape);
+    }
+
+    @Override
+    public void showTextArea(){
+        TextArea textArea = getTextArea();
+        textArea.setWrapText(true);
+        textArea.setLayoutX(GlobalConfig.IOFRAME_OFFSET / 2);
+        textArea.setLayoutY(0);
+        textArea.setPrefWidth(getPrefWidth() - GlobalConfig.IOFRAME_OFFSET);
+        textArea.setPrefHeight(getPrefHeight());
+        if(!getChildren().contains(textArea)){
+            getChildren().addAll(textArea);
+        }
+    }
+
+    @Override
+    public void updateText(){
+        Text text = getText();
+        text.setLayoutX(GlobalConfig.IOFRAME_OFFSET / 2);
+        text.setLayoutY(0);
+        text.setWrappingWidth(getPrefWidth() - GlobalConfig.IOFRAME_OFFSET);
+        text.setTextAlignment(TextAlignment.CENTER);
+        Bounds bounds = text.getBoundsInParent();
+        double y = getPrefHeight() - bounds.getHeight();
+        text.setY(y / 2 + getTextHeight());
     }
 }

@@ -120,6 +120,26 @@ public abstract class AbstractLine extends Polyline implements MShape {
         return toLocal;
     }
 
+    @Override
+    public void showTextArea() {
+
+    }
+
+    @Override
+    public void hideTextArea() {
+
+    }
+
+    @Override
+    public void updateText() {
+
+    }
+
+    @Override
+    public void setTextListenerEvent() {
+
+    }
+
     public double getStartX() {
         return startX.get();
     }

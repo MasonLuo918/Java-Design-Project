@@ -121,6 +121,7 @@ public class StraightLine extends AbstractLine {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 startX.set(MouseInParent.getX());
                 startY.set(MouseInParent.getY());
+
             }
         });
 
@@ -130,7 +131,6 @@ public class StraightLine extends AbstractLine {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 endX.set(MouseInParent.getX());
                 endY.set(MouseInParent.getY());
-                SymbolManage.getManage().detect(circles[1].getCenterX(), circles[1].getCenterY());
             }
         });
 

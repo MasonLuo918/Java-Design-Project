@@ -62,4 +62,12 @@ public interface MShape {
     public void setCursorPoint(Point2D cursorPoint);
 
     public Point2D getCursorPoint();
+
+    public void showTextArea();
+
+    public void hideTextArea();
+
+    public void updateText();
+
+    public void setTextListenerEvent();
 }

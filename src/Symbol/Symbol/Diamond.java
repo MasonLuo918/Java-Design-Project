@@ -4,7 +4,10 @@ import Symbol.GlobalConfig;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
+import javafx.scene.control.TextArea;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Text;
 
 public class Diamond extends AbstractSymbol{
     @Override
@@ -85,5 +88,42 @@ public class Diamond extends AbstractSymbol{
 
         DiamondShape diamond = new DiamondShape();
         setMyShape(diamond);
+    }
+
+    @Override
+    public void showTextArea(){
+        TextArea textArea = getTextArea();
+        textArea.setWrapText(true);
+        textArea.setLayoutX(getPrefWidth() / 4);
+        textArea.setLayoutY(getPrefHeight() / 4);
+        textArea.setPrefWidth(getPrefWidth() / 2);
+        textArea.setPrefHeight(getPrefHeight() / 2);
+        if(!getChildren().contains(textArea)){
+            getChildren().addAll(textArea);
+        }
+    }
+
+    @Override
+    public void setTextListenerEvent(){
+        getText().textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if(getText().getBoundsInLocal().getHeight() > getTextArea().getHeight() - getTextHeight()){
+                    getText().setText(oldValue);
+                }
+                updateText();
+            }
+        });
+    }
+
+    @Override
+    public void updateText(){
+        Text text = getText();
+        text.setWrappingWidth(getPrefWidth() / 2);
+        text.setLayoutX(getPrefWidth() / 4);
+        text.setLayoutY(getPrefHeight() / 4);
+        Bounds bounds = text.getBoundsInParent();
+        double y = getPrefHeight() / 2 - bounds.getHeight();
+        text.setY(y / 2 + getTextHeight());
     }
 }

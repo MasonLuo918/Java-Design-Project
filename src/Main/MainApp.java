@@ -3,10 +3,14 @@ package Main;
 import Controller.MainAppController;
 import Manager.SymbolManage;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -22,6 +26,8 @@ public class MainApp extends Application {
 
     private BorderPane rootLayout;
 
+    private Scene scene;
+
     private MenuBar menuBar;
 
     private MainApp mainApp;
@@ -36,9 +42,10 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         initLayout();
+        scene = new Scene(rootLayout,900,600);
         SymbolManage.getManage().setMainApp(this); //连接Manage和MainApp
         initController();
-        primaryStage.setScene(new Scene(rootLayout, 900, 600));
+        primaryStage.setScene(scene);
         primaryStage.show();
         primaryStage.setTitle("Flow Chart");
     }
@@ -113,6 +120,14 @@ public class MainApp extends Application {
 
     public void setMenuBar(MenuBar menuBar) {
         this.menuBar = menuBar;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     public static void main(String[] args){

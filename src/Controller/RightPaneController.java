@@ -1,5 +1,6 @@
 package Controller;
 
+import Main.MainApp;
 import Manager.SymbolManage;
 import Symbol.*;
 import Symbol.Line.AbstractLine;
@@ -8,18 +9,21 @@ import Symbol.Symbol.AbstractSymbol;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Polyline;
-
-import java.awt.*;
-import java.lang.reflect.Constructor;
 
 
 public class RightPaneController extends Controller {
     private static RightPaneController rightPaneController = new RightPaneController();
 
-    public Pane rightPane;
+    private Pane rightPane;
+
+    private MainApp mainApp;
+
+    Label label = new Label("****");
 
     private RightPaneController() {
 
@@ -27,14 +31,6 @@ public class RightPaneController extends Controller {
 
     public static RightPaneController getRightPaneController() {
         return rightPaneController;
-    }
-
-    public Pane getRightPane() {
-        return rightPane;
-    }
-
-    public void setRightPane(Pane rightPane) {
-        this.rightPane = rightPane;
     }
 
     @Override
@@ -55,6 +51,9 @@ public class RightPaneController extends Controller {
                         MShape mShape = (MShape) node;
                         if (mShape.containsPointInScene(event.getSceneX(), event.getSceneY())) {
                             mShape.select(event);
+                            if(event.getClickCount() == 2){
+                                mShape.showTextArea();
+                            }
                             inMyShape = true;
                         }
                         /*
@@ -70,7 +69,7 @@ public class RightPaneController extends Controller {
                             /**
                              * 如果是一条线的话，记录线的各个点的坐标
                              */
-                        }else{
+                        } else {
                             AbstractLine line = (AbstractLine) mShape;
                             line.setLastStartX(line.getStartX());
                             line.setLastStartY(line.getStartY());
@@ -147,7 +146,7 @@ public class RightPaneController extends Controller {
                 if (event.isControlDown()) {
                     return;
                 }
-                if (SymbolManage.getManage().isOpertionDrag()) {
+                if (SymbolManage.getManage().isOperationDrag()) {
                     return;
                 }
                 Point2D eventPointInScene = rightPane.sceneToLocal(event.getSceneX(), event.getSceneY());
@@ -184,5 +183,30 @@ public class RightPaneController extends Controller {
                 }
             }
         });
+
+        mainApp.getScene().setOnKeyTyped(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.getCode().getName().equals(KeyCode.BACK_SPACE.getName())){
+                    SymbolManage.getManage().deleteSelectedShapeFromRightPane();
+                }
+            }
+        });
+    }
+
+    public Pane getRightPane() {
+        return rightPane;
+    }
+
+    public void setRightPane(Pane rightPane) {
+        this.rightPane = rightPane;
+    }
+
+    public MainApp getMainApp() {
+        return mainApp;
+    }
+
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
     }
 }

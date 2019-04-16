@@ -1,5 +1,7 @@
 package Symbol.Symbol;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
@@ -44,5 +46,7 @@ public class ConnetSymbol extends AbstractSymbol{
 
     @Override
     public void drawConnectCircle() {
+
     }
+
 }
