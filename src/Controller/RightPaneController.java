@@ -184,7 +184,7 @@ public class RightPaneController extends Controller {
             }
         });
 
-        mainApp.getScene().setOnKeyTyped(new EventHandler<KeyEvent>() {
+        mainApp.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 if(event.getCode().getName().equals(KeyCode.BACK_SPACE.getName())){
