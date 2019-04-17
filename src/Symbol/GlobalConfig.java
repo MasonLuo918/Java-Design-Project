@@ -36,6 +36,7 @@ public interface GlobalConfig {
 
     public static final double ARROW_LENGTH = 10;
 
+    public static final double MAX_NUMBER = 1000000000;
     /**
      * 平行四边形缩紧距离
      */

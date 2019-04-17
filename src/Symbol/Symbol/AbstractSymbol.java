@@ -3,15 +3,14 @@ package Symbol.Symbol;
 import Manager.SymbolManage;
 import Symbol.GlobalConfig;
 import Symbol.MShape;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -21,6 +20,10 @@ import javafx.scene.shape.Shape;
 import MathUtil.MathUtil;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public abstract class AbstractSymbol extends Pane implements MShape {
@@ -34,6 +37,9 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     /*
      * 当连接线接近的时候,就会显示这几个circle，用以连接
      */
+
+    private List<SimpleDoubleProperty> connectCircleCoorOfParent = new ArrayList<>();
+
     private Circle[] connectCircle = new Circle[4];
 
     /*
@@ -74,6 +80,9 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         /*
          * 给操作框对象分配内存空间
          */
+        for(int i = 0; i < 8; i++){
+            getConnectCircleCoorOfParent().add(new SimpleDoubleProperty());
+        }
         for (int i = 0; i < circles.length; i++) {
             circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
             circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
@@ -201,6 +210,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 drawOperationFrame();
                 drawConnectCircle();
                 updateText();
+                updateConnectCircleCoorInParent();
             }
         });
 
@@ -213,9 +223,14 @@ public abstract class AbstractSymbol extends Pane implements MShape {
                 drawOperationFrame();
                 drawConnectCircle();
                 updateText();
+                updateConnectCircleCoorInParent();
             }
         });
-
+        PositionListener positionListener = new PositionListener();
+        translateXProperty().addListener(positionListener);
+        translateYProperty().addListener(positionListener);
+        layoutXProperty().addListener(positionListener);
+        layoutYProperty().addListener(positionListener);
     }
 
     @Override
@@ -568,6 +583,16 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         text.setY(y / 2 + getTextHeight());
     }
 
+    public void updateConnectCircleCoorInParent(){
+        for(int i = 0; i < 4; i++){
+            double x = connectCircle[i].getCenterX();
+            double y = connectCircle[i].getCenterY();
+            Point2D point = localToParent(x, y);
+            getConnectCircleCoorOfParent().get(2 * i).set(point.getX());
+            getConnectCircleCoorOfParent().get(2 * i + 1).set(point.getY());
+        }
+    }
+
     public Circle[] getConnectCircle() {
         return connectCircle;
     }
@@ -598,5 +623,21 @@ public abstract class AbstractSymbol extends Pane implements MShape {
 
     public void setTextHeight(double textHeight) {
         this.textHeight = textHeight;
+    }
+
+    public List<SimpleDoubleProperty> getConnectCircleCoorOfParent() {
+        return connectCircleCoorOfParent;
+    }
+
+    public void setConnectCircleCoorOfParent(List<SimpleDoubleProperty> connectCircleCoorOfParent) {
+        this.connectCircleCoorOfParent = connectCircleCoorOfParent;
+    }
+
+    class PositionListener implements ChangeListener{
+        @Override
+        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+            AbstractSymbol.this.drawConnectCircle();
+            AbstractSymbol.this.updateConnectCircleCoorInParent();
+        }
     }
 }

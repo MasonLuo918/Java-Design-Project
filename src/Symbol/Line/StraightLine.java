@@ -24,6 +24,7 @@ public class StraightLine extends AbstractLine {
     private Circle[] circles = new Circle[2];
 
     public StraightLine(Pane drawPane){
+        super();
         setDrawPane(drawPane);
         setLineType(LineType.STRAIGHT_LINE);
         setStrokeWidth(2);
@@ -115,13 +116,31 @@ public class StraightLine extends AbstractLine {
 
     @Override
     public void initOperationFrameEvent() {
+        circles[0].setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(getStartConnect().isBind()){
+                    getEndConnect().unConnect();
+                }
+            }
+        });
+
+        circles[1].setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(getEndConnect().isBind()){
+                    getEndConnect().unConnect();
+                }
+            }
+        });
+
         circles[0].setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 startX.set(MouseInParent.getX());
                 startY.set(MouseInParent.getY());
-
+                SymbolManage.getManage().detectLineEnter(startX.get(), startY.get());
             }
         });
 
@@ -131,6 +150,23 @@ public class StraightLine extends AbstractLine {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 endX.set(MouseInParent.getX());
                 endY.set(MouseInParent.getY());
+                SymbolManage.getManage().detectLineEnter(endX.get(), endY.get());
+            }
+        });
+        circles[0].setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Point2D point = localToParent(circles[1].getCenterX(), circles[1].getCenterY());
+                SymbolManage.getManage().connect(StraightLine.this, getStartConnect());
+                SymbolManage.getManage().removeAllConnectSymbol();
+            }
+        });
+        circles[1].setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Point2D point = localToParent(circles[1].getCenterX(), circles[1].getCenterY());
+                SymbolManage.getManage().connect(StraightLine.this, getEndConnect());
+                SymbolManage.getManage().removeAllConnectSymbol();
             }
         });
 

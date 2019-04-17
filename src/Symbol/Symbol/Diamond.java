@@ -8,6 +8,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.control.TextArea;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 public class Diamond extends AbstractSymbol{
     @Override
@@ -120,6 +121,7 @@ public class Diamond extends AbstractSymbol{
     public void updateText(){
         Text text = getText();
         text.setWrappingWidth(getPrefWidth() / 2);
+        text.setTextAlignment(TextAlignment.CENTER);
         text.setLayoutX(getPrefWidth() / 4);
         text.setLayoutY(getPrefHeight() / 4);
         Bounds bounds = text.getBoundsInParent();

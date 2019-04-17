@@ -3,10 +3,15 @@ package Manager;
 
 import Main.MainApp;
 import MathUtil.MathUtil;
+import Symbol.Connect;
+import Symbol.GlobalConfig;
+import Symbol.Line.AbstractLine;
 import Symbol.MShape;
 import Symbol.Symbol.AbstractSymbol;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -28,6 +33,8 @@ public class SymbolManage {
     private boolean isOperationDrag = false;
 
     private ObservableList<MShape> selectedShape = FXCollections.observableArrayList();
+
+    private ObservableList<AbstractSymbol> connectSymbol = FXCollections.observableArrayList();
 
     private MainApp mainApp;
 
@@ -156,4 +163,83 @@ public class SymbolManage {
         removeAll();
     }
 
+    public void addConnectSymbol(AbstractSymbol symbol){
+        if(!connectSymbol.contains(symbol)){
+            connectSymbol.add(symbol);
+            symbol.showConnectCircle();
+        }
+    }
+
+    public void removeConnectSymbol(AbstractSymbol symbol){
+        if(connectSymbol.contains(symbol)){
+            connectSymbol.remove(symbol);
+            symbol.hideConnectCircle();
+        }
+    }
+
+    public void removeAllConnectSymbol(){
+        for(AbstractSymbol symbol:connectSymbol){
+            symbol.hideConnectCircle();
+        }
+        connectSymbol.removeAll();
+    }
+
+    /**
+     *
+     * @param x - 需要在rightPane上的坐标
+     * @param y - 需要在rightPane上的坐标
+     */
+    public void detectLineEnter(double x, double y){
+        for(Node node:mainApp.getRightPane().getChildren()){
+            if(node instanceof AbstractSymbol){
+                AbstractSymbol symbol = (AbstractSymbol) node;
+                Bounds bounds = symbol.getBoundsInParent();
+                if(bounds.getMinX() - GlobalConfig.ENTER_WIDTH < x && bounds.getMinY() - GlobalConfig.ENTER_WIDTH < y
+                        && bounds.getMaxX() + GlobalConfig.ENTER_WIDTH > x && bounds.getMaxY() + GlobalConfig.ENTER_WIDTH > y){
+                    addConnectSymbol(symbol);
+                }else{
+                    removeConnectSymbol(symbol);
+                }
+            }
+        }
+    }
+
+    public void connect(AbstractLine line, Connect connect){
+//        AbstractSymbol nowSymbol = connectSymbol.get(0);
+//        int circleIndex = 0;
+//        Circle nowCircle;
+//        Point2D pointInParent = nowSymbol.localToParent(nowSymbol.getConnectCircle()[circleIndex].getCenterX(),
+//                nowSymbol.getConnectCircle()[circleIndex].getCenterY());
+//        double distance = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
+//        for(int i = 0; i < nowSymbol.getConnectCircle().length; i++){
+//            pointInParent = nowSymbol.localToParent(nowSymbol.getConnectCircle()[i].getCenterX(),
+//                    nowSymbol.getConnectCircle()[i].getCenterY());
+//
+//            double length = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
+//            if(length < distance){
+//                circleIndex = i;
+//            }
+//        }
+
+        AbstractSymbol nowSymbol = null;
+        int circleIndex = 0;
+        double distance = GlobalConfig.MAX_NUMBER;
+        Point2D pointInParent;
+        for(AbstractSymbol symbol: connectSymbol){
+            for(int i = 0; i < symbol.getConnectCircle().length; i++){
+                pointInParent = symbol.localToParent(symbol.getConnectCircle()[i].getCenterX(), symbol.getConnectCircle()[i].getCenterY());
+                double length = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
+                if(length < distance){
+                    nowSymbol = symbol;
+                    distance = length;
+                    circleIndex = i;
+                }
+            }
+        }
+        if(!connectSymbol.isEmpty()){
+            connect.setSymbol(nowSymbol);
+            connect.setCircleIndex(circleIndex);
+            connect.connect();
+        }
+    }
 }

@@ -1,12 +1,16 @@
 package Symbol.Line;
 
+import Symbol.Connect;
 import Symbol.MShape;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polyline;
+import javafx.scene.text.Text;
 
 public abstract class AbstractLine extends Polyline implements MShape {
 
@@ -22,10 +26,6 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     private double lastStartY;
 
-    private double lastMiddleX;
-
-    private double lastMiddleY;
-
     private double lastEndX;
 
     private double lastEndY;
@@ -33,6 +33,14 @@ public abstract class AbstractLine extends Polyline implements MShape {
     private Point2D cursorPoint;
 
     private double lineLength = 100;
+
+    private TextField textField = new TextField();
+
+    private Text text = new Text();
+
+    private Connect startConnect = new Connect(this);
+
+    private Connect endConnect = new Connect(this);
 
     SimpleDoubleProperty startX = new SimpleDoubleProperty();
 
@@ -46,7 +54,12 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     SimpleDoubleProperty middleY = new SimpleDoubleProperty();
 
-
+    public AbstractLine(){
+        startConnect.setLineXProperty(startX);
+        startConnect.setLineYProperty(startY);
+        endConnect.setLineXProperty(endX);
+        endConnect.setLineYProperty(endY);
+    }
 
     public Pane getDrawPane() {
         return drawPane;
@@ -56,6 +69,7 @@ public abstract class AbstractLine extends Polyline implements MShape {
         this.drawPane = drawPane;
     }
 
+
     public int getLineType() {
         return lineType;
     }
@@ -63,6 +77,7 @@ public abstract class AbstractLine extends Polyline implements MShape {
     public void setLineType(int lineType) {
         this.lineType = lineType;
     }
+
 
     @Override
     public boolean isLine() {
@@ -244,19 +259,20 @@ public abstract class AbstractLine extends Polyline implements MShape {
         this.lastEndY = lastEndY;
     }
 
-    public double getLastMiddleX() {
-        return lastMiddleX;
+    public Connect getStartConnect() {
+        return startConnect;
     }
 
-    public void setLastMiddleX(double lastMiddleX) {
-        this.lastMiddleX = lastMiddleX;
+    public void setStartConnect(Connect startConnect) {
+        this.startConnect = startConnect;
     }
 
-    public double getLastMiddleY() {
-        return lastMiddleY;
+    public Connect getEndConnect() {
+        return endConnect;
     }
 
-    public void setLastMiddleY(double lastMiddleY) {
-        this.lastMiddleY = lastMiddleY;
+    public void setEndConnect(Connect endConnect) {
+        this.endConnect = endConnect;
     }
+
 }

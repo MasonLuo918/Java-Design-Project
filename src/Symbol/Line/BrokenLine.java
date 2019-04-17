@@ -16,7 +16,7 @@ import javafx.scene.shape.Circle;
 
 public class BrokenLine extends AbstractLine {
 
-    private Circle[] circles = new Circle[3];
+    private Circle[] circles = new Circle[2];
 
     public BrokenLine(Pane drawPane){
         setDrawPane(drawPane);
@@ -29,10 +29,10 @@ public class BrokenLine extends AbstractLine {
         }
         startX.set((getDrawPane().getWidth() - getLineLength()) / 2);
         startY.set(getDrawPane().getHeight() / 2);
-        middleX.set((getDrawPane().getWidth() + getLineLength()) / 2);
-        middleY.set(getDrawPane().getHeight() / 2);
         endX.set((getDrawPane().getWidth() + getLineLength()) / 2);
         endY.set(getDrawPane().getHeight() / 2 + getLineLength());
+        middleX.bind(endX);
+        middleY.bind(startY);
         updateLine();
         drawOperationFrame();
         initEvent();
@@ -153,32 +153,56 @@ public class BrokenLine extends AbstractLine {
                 }
             });
         }
+        circles[0].setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(getStartConnect().isBind()){
+                    getEndConnect().unConnect();
+                }
+            }
+        });
+        circles[1].setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(getEndConnect().isBind()){
+                    getEndConnect().unConnect();
+                }
+            }
+        });
+
         circles[0].setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 setStartX(MouseInParent.getX());
                 setStartY(MouseInParent.getY());
-                setMiddleY(MouseInParent.getY());
+                SymbolManage.getManage().detectLineEnter(startX.get(), startY.get());
             }
         });
         circles[1].setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                setMiddleX(MouseInParent.getX());
-                setMiddleY(MouseInParent.getY());
-                setStartY(MouseInParent.getY());
-                setEndX(MouseInParent.getX());
-            }
-        });
-        circles[2].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                setMiddleX(MouseInParent.getX());
                 setEndX(MouseInParent.getX());
                 setEndY(MouseInParent.getY());
+                SymbolManage.getManage().detectLineEnter(endX.get(),endY.get());
+            }
+        });
+        circles[0].setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Point2D point = localToParent(circles[1].getCenterX(), circles[1].getCenterY());
+                SymbolManage.getManage().connect(BrokenLine.this, getStartConnect());
+                SymbolManage.getManage().removeAllConnectSymbol();
+            }
+        });
+
+        circles[1].setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Point2D point = localToParent(circles[1].getCenterX(), circles[1].getCenterY());
+                SymbolManage.getManage().connect(BrokenLine.this, getEndConnect());
+                SymbolManage.getManage().removeAllConnectSymbol();
             }
         });
     }
@@ -187,10 +211,8 @@ public class BrokenLine extends AbstractLine {
     public void drawOperationFrame() {
         circles[0].setCenterX(getStartX());
         circles[0].setCenterY(getStartY());
-        circles[1].setCenterX(getMiddleX());
-        circles[1].setCenterY(getMiddleY());
-        circles[2].setCenterX(getEndX());
-        circles[2].setCenterY(getEndY());
+        circles[1].setCenterX(getEndX());
+        circles[1].setCenterY(getEndY());
     }
 
     @Override

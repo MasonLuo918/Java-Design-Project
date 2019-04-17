@@ -75,8 +75,6 @@ public class RightPaneController extends Controller {
                             line.setLastStartY(line.getStartY());
                             line.setLastEndX(line.getEndX());
                             line.setLastEndY(line.getEndY());
-                            line.setLastMiddleX(line.getMiddleX());
-                            line.setLastMiddleY(line.getMiddleY());
                         }
                     }
                 } catch (Exception e) {
@@ -119,10 +117,8 @@ public class RightPaneController extends Controller {
                                     case LineType.BROKEN_LINE:
                                         line.setStartX(point2D.getX() - line.getLineLength() / 2);
                                         line.setStartY(point2D.getY());
-                                        line.setMiddleX(point2D.getX() + line.getLineLength() / 2);
-                                        line.setMiddleY(point2D.getY());
-                                        line.setEndX(line.getMiddleX());
-                                        line.setEndY(line.getMiddleY() + line.getLineLength());
+                                        line.setEndX(line.getStartX() + line.getLineLength());
+                                        line.setEndY(line.getStartY() + line.getLineLength());
                                         break;
                                 }
                             }
@@ -171,14 +167,16 @@ public class RightPaneController extends Controller {
                         double newStartY = line.getLastStartY() + dragY;
                         double newEndX = line.getLastEndX() + dragX;
                         double newEndY = line.getLastEndY() + dragY;
-                        double newMiddleX = line.getLastMiddleX() + dragX;
-                        double newMiddleY = line.getLastMiddleY() + dragY;
-                        line.setStartX(newStartX);
-                        line.setStartY(newStartY);
-                        line.setMiddleX(newMiddleX);
-                        line.setMiddleY(newMiddleY);
-                        line.setEndX(newEndX);
-                        line.setEndY(newEndY);
+                        /**
+                         * 如果没有绑定，则可以设置新位置
+                         */
+                        if(!line.getStartConnect().isBind() && !line.getEndConnect().isBind()){
+                            line.setStartX(newStartX);
+                            line.setStartY(newStartY);
+                            line.setEndX(newEndX);
+                            line.setEndY(newEndY);
+                        }
+
                     }
                 }
             }
