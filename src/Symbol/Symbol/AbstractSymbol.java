@@ -1,74 +1,60 @@
 package Symbol.Symbol;
 
 import Manager.SymbolManage;
+import Symbol.Frame.ConnectCircleFrame;
+import Symbol.Frame.OperationFrame;
 import Symbol.GlobalConfig;
 import Symbol.MShape;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.scene.Cursor;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import MathUtil.MathUtil;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public abstract class AbstractSymbol extends Pane implements MShape {
 
 
     /*
-     * circles[0]为旋转该图形的circle,其他依次为左上角顺时针数过去
+     * 操作框
      */
-    private Circle[] circles = new Circle[9];
+    private OperationFrame operationFrame = new OperationFrame(this);
 
     /*
-     * 当连接线接近的时候,就会显示这几个circle，用以连接
+     * 连接框
      */
-
-    private List<SimpleDoubleProperty> connectCircleCoorOfParent = new ArrayList<>();
-
-    private Circle[] connectCircle = new Circle[4];
-
-    /*
-     * lines[0]为连接旋转圆的线,其他依次为上右下左四条操作线
-     */
-    private Line[] lines = new Line[5];
-
-    private TextArea textArea = new TextArea();
-
-    private Text text = new Text("");
+    private ConnectCircleFrame connectCircleFrame = new ConnectCircleFrame(this);
 
     /*
      * 设置Symbol
      */
     private Shape myShape;
 
-    /**
+    /*
      * 设置Layout到鼠标的距离
      */
     private double initX;
-
     private double initY;
 
-    /**
-     * text 在一行的情况下的高
+    /*
+     * text在一行的情况下的高
      */
     private double textHeight = 0;
 
+    /*
+     *  鼠标点下时，记录鼠标在Parent的坐标
+     */
     private Point2D cursorPoint;
+
+
+    private TextArea textArea = new TextArea();
+
+    private Text text = new Text("");
 
     public AbstractSymbol() {
         init();
@@ -77,28 +63,6 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     public void init() {
         setPrefSize(GlobalConfig.PANE_WIDTH, GlobalConfig.PANE_HEIGHT);
         initTextHeight();
-        /*
-         * 给操作框对象分配内存空间
-         */
-        for(int i = 0; i < 8; i++){
-            getConnectCircleCoorOfParent().add(new SimpleDoubleProperty());
-        }
-        for (int i = 0; i < circles.length; i++) {
-            circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
-            circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
-            circles[i].setCursor(Cursor.E_RESIZE);
-        }
-        //更改旋转圆手势
-        circles[0].setCursor(Cursor.HAND);
-        for (int i = 0; i < connectCircle.length; i++) {
-            connectCircle[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
-            connectCircle[i].setFill(GlobalConfig.CONNECT_CIRCLE_COLOR);
-        }
-        for (int i = 0; i < lines.length; i++) {
-            lines[i] = new Line();
-            lines[i].setStroke(GlobalConfig.OPERATION_FRAME_LINE_COLOR);
-            lines[i].getStrokeDashArray().add(3.0);
-        }
         text.setFont(GlobalConfig.FONT);
         textArea.setFont(GlobalConfig.FONT);
         text.textProperty().bindBidirectional(textArea.textProperty());
@@ -106,96 +70,26 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         initMyShape();
         initEvent();
         initOperationFrameEvent();
-        getChildren().addAll(myShape,text);
+        getChildren().addAll(myShape, text);
     }
-
 
     @Override
     public void showOperationFrame() {
-        hideOperationFrame();
-        drawOperationFrame();
-        for (Circle circle : circles) {
-            getChildren().add(circle);
-        }
-
-        for (Line line : lines) {
-            getChildren().add(line);
-        }
+        operationFrame.showOperationFrame();
     }
 
     @Override
     public void hideOperationFrame() {
-        for (Circle circle : circles) {
-            getChildren().remove(circle);
-        }
-
-        for (Line line : lines) {
-            getChildren().remove(line);
-        }
-    }
-
-    @Override
-    public void drawOperationFrame() {
-        circles[0].setCenterX(getPrefWidth() / 2);
-        circles[0].setCenterY(-GlobalConfig.OFFSET);
-
-        circles[1].setCenterX(0);
-        circles[1].setCenterY(0);
-
-        circles[2].setCenterX(getPrefWidth() / 2);
-        circles[2].setCenterY(0);
-
-        circles[3].setCenterX(getPrefWidth());
-        circles[3].setCenterY(0);
-
-        circles[4].setCenterX(getPrefWidth());
-        circles[4].setCenterY(getPrefHeight() / 2);
-
-        circles[5].setCenterX(getPrefWidth());
-        circles[5].setCenterY(getPrefHeight());
-
-        circles[6].setCenterX(getPrefWidth() / 2);
-        circles[6].setCenterY(getPrefHeight());
-
-        circles[7].setCenterX(0);
-        circles[7].setCenterY(getPrefHeight());
-
-        circles[8].setCenterX(0);
-        circles[8].setCenterY(getPrefHeight() / 2);
-
-        lines[0].setStartX(getPrefWidth() / 2);
-        lines[0].setStartY(GlobalConfig.CIRCLE_RADIUS - GlobalConfig.OFFSET);
-        lines[0].setEndX(getPrefWidth() / 2);
-        lines[0].setEndY(-GlobalConfig.CIRCLE_RADIUS);
-
-        lines[1].setStartX(GlobalConfig.CIRCLE_RADIUS);
-        lines[1].setStartY(0);
-        lines[1].setEndX(getPrefWidth() - GlobalConfig.CIRCLE_RADIUS);
-        lines[1].setEndY(0);
-
-        lines[2].setStartX(getPrefWidth());
-        lines[2].setStartY(0);
-        lines[2].setEndX(getPrefWidth());
-        lines[2].setEndY(getPrefHeight() - GlobalConfig.CIRCLE_RADIUS);
-
-        lines[3].setStartX(getPrefWidth() - GlobalConfig.CIRCLE_RADIUS);
-        lines[3].setStartY(getPrefHeight());
-        lines[3].setEndX(GlobalConfig.CIRCLE_RADIUS);
-        lines[3].setEndY(getPrefHeight());
-
-        lines[4].setStartX(0);
-        lines[4].setStartY(getPrefHeight() - GlobalConfig.CIRCLE_RADIUS);
-        lines[4].setEndX(0);
-        lines[4].setEndY(0);
+        operationFrame.hideOperationFrame();
     }
 
     @Override
     public void select(MouseEvent event) {
         SymbolManage manage = SymbolManage.getManage();
         if (event.isControlDown()) {
-            manage.addMore(this);
+            manage.getSelectedShape().addMore(this);
         } else {
-            manage.add(this);
+            manage.getSelectedShape().add(this);
         }
     }
 
@@ -231,180 +125,16 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         translateYProperty().addListener(positionListener);
         layoutXProperty().addListener(positionListener);
         layoutYProperty().addListener(positionListener);
+        rotateProperty().addListener(positionListener);
     }
 
     @Override
     public void initOperationFrameEvent() {
-
-        for (Circle circle : circles) {
-
-            /**
-             * 当监测到按下操作圆的时候，将OperationDrag设置为true，以便禁止拖拽
-             */
-            circle.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    SymbolManage symbolManage = SymbolManage.getManage();
-                    symbolManage.setOperationDrag(true);
-                    setInitX(getTranslateX());
-                    setInitY(getTranslateY());
-                    setCursorPoint(sceneToParent(event.getSceneX(), event.getSceneY()));
-                }
-            });
-
-            circle.setOnMouseReleased(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    SymbolManage symbolManage = SymbolManage.getManage();
-                    symbolManage.setOperationDrag(false);
-                }
-            });
-            circle.setOnMouseEntered(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    circle.setFill(Color.RED);
-                }
-            });
-            circle.setOnMouseExited(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    circle.setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
-                }
-            });
-        }
-        circles[0].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D eventCoorRelativeToParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double shapeCenterX = getPrefWidth() / 2 + getLayoutX() + getTranslateX();
-                double shapeCenterY = getPrefHeight() / 2 + getLayoutY() + getTranslateY();
-                double ax = 0;
-                double ay = shapeCenterY - getLayoutY();
-                double bx = eventCoorRelativeToParent.getX() - shapeCenterX;
-                double by = shapeCenterY - eventCoorRelativeToParent.getY();
-                double a = shapeCenterY - getLayoutY();
-                double b = MathUtil.distance(shapeCenterX, shapeCenterY, eventCoorRelativeToParent.getX(),
-                        eventCoorRelativeToParent.getY());
-                double arc = Math.acos((ax * bx + ay * by) / (a * b));
-                double angle = MathUtil.arcChangeAngle(arc);
-                if (bx < 0) {
-                    angle *= -1;
-                }
-                setRotate(angle);
-
-            }
-        });
-
-        circles[1].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double dragX = mousePointInParent.getX() - cursorPoint.getX();
-                double dragY = mousePointInParent.getY() - cursorPoint.getY();
-                double newPositionX = (initX + dragX);
-                double newPositionY = (initY + dragY);
-                double oldWidth = getPrefWidth();
-                double oldHeight = getPrefHeight();
-                double addWidth = (getTranslateX() - newPositionX);
-                double addHeight = (getTranslateY() - newPositionY);
-                setPrefWidth(getPrefWidth() + addWidth);
-                if (getPrefWidth() != oldWidth) {
-                    setTranslateX(newPositionX);
-                }
-                setPrefHeight(getPrefHeight() + addHeight);
-                if (getPrefHeight() != oldHeight) {
-                    setTranslateY(newPositionY);
-                }
-            }
-        });
-
-        circles[2].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double dragY = mousePointInParent.getY() - cursorPoint.getY();
-                double newPositionY = (initY + dragY);
-                double oldHeight = getPrefHeight();
-                double addHeight = (getTranslateY() - newPositionY);
-                setPrefHeight(getPrefHeight() + addHeight);
-                if (oldHeight != getPrefHeight()) {
-                    setTranslateY(newPositionY);
-                }
-            }
-        });
-
-        circles[3].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double dragY = mousePointInParent.getY() - cursorPoint.getY();
-                double newPositionY = initY + dragY;
-                double addHeight = (getTranslateY() - newPositionY);
-                double oldHeight = getPrefHeight();
-                setPrefWidth(mousePointInParent.getX() - initX - getLayoutX());
-                setPrefHeight(getPrefHeight() + addHeight);
-                if (oldHeight != getPrefHeight()) {
-                    setTranslateY(newPositionY);
-                }
-            }
-        });
-        circles[4].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double dragX = mousePointInParent.getX() - cursorPoint.getX();
-                double newPositionX = initX + dragX;
-                double addWeight = newPositionX - getTranslateX();
-                setPrefWidth(mousePointInParent.getX() - getInitX() - getLayoutX());
-            }
-        });
-        circles[5].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                setPrefWidth(mousePointInParent.getX() - getInitX() - getLayoutX());
-                setPrefHeight(mousePointInParent.getY() - getInitY() - getLayoutY());
-            }
-        });
-        circles[6].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                setPrefHeight(mousePointInParent.getY() - getInitY() - getLayoutY());
-            }
-        });
-        circles[7].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double dragX = mousePointInParent.getX() - cursorPoint.getX();
-                double newPositionX = getInitX() + dragX;
-                double oldWidth = getPrefWidth();
-                double addWidth = getTranslateX() - newPositionX;
-                setPrefWidth(getPrefWidth() + addWidth);
-                if (getPrefWidth() != oldWidth) {
-                    setTranslateX(newPositionX);
-                }
-                setPrefHeight(mousePointInParent.getY() - getInitY() - getLayoutY());
-            }
-        });
-        circles[8].setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Point2D mousePointInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                double dragX = mousePointInParent.getX() - cursorPoint.getX();
-                double newPositionX = getInitX() + dragX;
-                double oldWidth = getPrefWidth();
-                double addWidth = getTranslateX() - newPositionX;
-                setPrefWidth(getPrefWidth() + addWidth);
-                if (getPrefWidth() != oldWidth) {
-                    setTranslateX(newPositionX);
-                }
-            }
-        });
+        operationFrame.initOperationFrameEvent();
     }
 
-    public void initTextHeight(){
+
+    public void initTextHeight() {
         Text text = new Text("Hello World");
         text.setFont(GlobalConfig.FONT);
         setTextHeight(text.getBoundsInLocal().getHeight());
@@ -413,7 +143,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     @Override
     public boolean containsPointInScene(double x, double y) {
         boolean inOperationFrame = false;
-        for (Circle circle : circles) {
+        for (Circle circle : operationFrame.getCircles()) {
             Bounds circleBoundsInLocal = circle.getBoundsInLocal();
             Bounds circleBoundsInScene = circle.localToScene(circleBoundsInLocal);
             if (circleBoundsInScene.contains(x, y)) {
@@ -467,6 +197,11 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         return false;
     }
 
+    @Override
+    public void drawOperationFrame() {
+        operationFrame.drawOperationFrame();
+    }
+
     /**
      * 初始化一个Shape，将Shape的宽高绑定该pane的宽高，使得pane的宽高变化时，内容能跟着变换
      * 不同的Shape绑定不同的宽高
@@ -513,57 +248,40 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     }
 
     public void showConnectCircle() {
-        hideConnectCircle();
-        drawConnectCircle();
-        for (Circle circle : connectCircle) {
-            getChildren().add(circle);
-        }
+        connectCircleFrame.showConnectCircle();
     }
 
     public void hideConnectCircle() {
-        for (Circle circle : connectCircle) {
-            getChildren().remove(circle);
-        }
+        connectCircleFrame.hideConnectCircle();
     }
 
     public void drawConnectCircle() {
-
-        connectCircle[0].setCenterX(getPrefWidth() / 2);
-        connectCircle[0].setCenterY(0);
-
-        connectCircle[1].setCenterX(getPrefWidth());
-        connectCircle[1].setCenterY(getPrefHeight() / 2);
-
-        connectCircle[2].setCenterX(getPrefWidth() / 2);
-        connectCircle[2].setCenterY(getPrefHeight());
-
-        connectCircle[3].setCenterX(0);
-        connectCircle[3].setCenterY(getPrefHeight() / 2);
+        connectCircleFrame.drawConnectCircle();
     }
 
     @Override
-    public void showTextArea(){
+    public void showTextArea() {
         textArea.setPrefHeight(getPrefHeight());
         textArea.setPrefWidth(getPrefWidth());
         textArea.setWrapText(true);
-        if(!getChildren().contains(textArea)){
+        if (!getChildren().contains(textArea)) {
             getChildren().addAll(textArea);
         }
     }
 
     @Override
-    public void hideTextArea(){
-        if(getChildren().contains(textArea)){
+    public void hideTextArea() {
+        if (getChildren().contains(textArea)) {
             getChildren().remove(textArea);
         }
     }
 
     @Override
-    public void setTextListenerEvent(){
+    public void setTextListenerEvent() {
         textArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if(text.getBoundsInLocal().getHeight() > getPrefHeight() - getTextHeight()){
+                if (text.getBoundsInLocal().getHeight() > getPrefHeight() - getTextHeight()) {
                     text.setText(oldValue);
                 }
                 updateText();
@@ -583,22 +301,8 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         text.setY(y / 2 + getTextHeight());
     }
 
-    public void updateConnectCircleCoorInParent(){
-        for(int i = 0; i < 4; i++){
-            double x = connectCircle[i].getCenterX();
-            double y = connectCircle[i].getCenterY();
-            Point2D point = localToParent(x, y);
-            getConnectCircleCoorOfParent().get(2 * i).set(point.getX());
-            getConnectCircleCoorOfParent().get(2 * i + 1).set(point.getY());
-        }
-    }
-
-    public Circle[] getConnectCircle() {
-        return connectCircle;
-    }
-
-    public void setConnectCircle(Circle[] connectCircle) {
-        this.connectCircle = connectCircle;
+    public void updateConnectCircleCoorInParent() {
+        connectCircleFrame.updateConnectCircleCoorInParent();
     }
 
     public TextArea getTextArea() {
@@ -625,15 +329,23 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         this.textHeight = textHeight;
     }
 
-    public List<SimpleDoubleProperty> getConnectCircleCoorOfParent() {
-        return connectCircleCoorOfParent;
+    public OperationFrame getOperationFrame() {
+        return operationFrame;
     }
 
-    public void setConnectCircleCoorOfParent(List<SimpleDoubleProperty> connectCircleCoorOfParent) {
-        this.connectCircleCoorOfParent = connectCircleCoorOfParent;
+    public void setOperationFrame(OperationFrame operationFrame) {
+        this.operationFrame = operationFrame;
     }
 
-    class PositionListener implements ChangeListener{
+    public ConnectCircleFrame getConnectCircleFrame() {
+        return connectCircleFrame;
+    }
+
+    public void setConnectCircleFrame(ConnectCircleFrame connectCircleFrame) {
+        this.connectCircleFrame = connectCircleFrame;
+    }
+
+    class PositionListener implements ChangeListener {
         @Override
         public void changed(ObservableValue observable, Object oldValue, Object newValue) {
             AbstractSymbol.this.drawConnectCircle();

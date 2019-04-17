@@ -3,7 +3,7 @@ package Manager;
 
 import Main.MainApp;
 import MathUtil.MathUtil;
-import Symbol.Connect;
+import Symbol.Line.Connect;
 import Symbol.GlobalConfig;
 import Symbol.Line.AbstractLine;
 import Symbol.MShape;
@@ -13,12 +13,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
-import sun.applet.resources.MsgAppletViewer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -28,11 +22,19 @@ import java.util.List;
  */
 public class SymbolManage {
 
+    /*
+     *  只能获取这个对象，不能新建对象
+     */
     private static SymbolManage manage = new SymbolManage();
 
+    /**
+     * 设置标志位，判断是否在操作框拖动
+     * 如果是在操作框拖动，就不进行symbol的
+     * 拖拽事件
+     */
     private boolean isOperationDrag = false;
 
-    private ObservableList<MShape> selectedShape = FXCollections.observableArrayList();
+    private Selected selectedShape = new Selected();
 
     private ObservableList<AbstractSymbol> connectSymbol = FXCollections.observableArrayList();
 
@@ -55,72 +57,6 @@ public class SymbolManage {
         return manage;
     }
 
-    public ObservableList<MShape> getSelectedShape() {
-        return selectedShape;
-    }
-
-    /**
-     * 当ctrl没有按下的时候
-     * 就调用这个函数将选中的shape加入selectedShape
-     *
-     * @param shape
-     */
-    public void add(MShape shape) {
-        if (getSelectedShape().contains(shape)) {
-            return;
-        }
-        for (MShape mShape : getSelectedShape()) {
-            mShape.hideOperationFrame();
-            mShape.hideTextArea();
-        }
-        getSelectedShape().clear();
-        getSelectedShape().add(shape);
-        shape.showOperationFrame();
-    }
-
-    /**
-     * 当ctrl按下的时候
-     * 调用这个函数，将选中的shape加入selecredShape
-     *
-     * @param shape
-     */
-    public void addMore(MShape shape) {
-        if (getSelectedShape().contains(shape)) {
-            return;
-        }
-        getSelectedShape().add(shape);
-        shape.showOperationFrame();
-    }
-
-    /**
-     * 取消全部选中
-     */
-    public void removeAll() {
-        for (MShape mShape : getSelectedShape()) {
-            mShape.hideOperationFrame();
-            mShape.hideTextArea();
-        }
-        getSelectedShape().clear();
-    }
-
-    /**
-     * 取消单个选中
-     *
-     * @param mShape
-     */
-    public void remove(MShape mShape) {
-        mShape.hideOperationFrame();
-        mShape.hideTextArea();
-        getSelectedShape().remove(mShape);
-    }
-
-    /**
-     * 设置标志位，判断是否在操作框拖动
-     * 如果是在操作框拖动，就不进行symbol的
-     * 拖拽事件
-     *
-     * @return
-     */
     public boolean isOperationDrag() {
         return isOperationDrag;
     }
@@ -157,11 +93,12 @@ public class SymbolManage {
      * 删除事件，删除右边面板选中的图形
      */
     public void deleteSelectedShapeFromRightPane() {
-        for (MShape mShape : getSelectedShape()) {
+        for (MShape mShape : selectedShape.getSelectedShape()) {
             mainApp.getRightPane().getChildren().remove(mShape);
         }
-        removeAll();
+        selectedShape.removeAll();
     }
+
 
     public void addConnectSymbol(AbstractSymbol symbol){
         if(!connectSymbol.contains(symbol)){
@@ -205,29 +142,13 @@ public class SymbolManage {
     }
 
     public void connect(AbstractLine line, Connect connect){
-//        AbstractSymbol nowSymbol = connectSymbol.get(0);
-//        int circleIndex = 0;
-//        Circle nowCircle;
-//        Point2D pointInParent = nowSymbol.localToParent(nowSymbol.getConnectCircle()[circleIndex].getCenterX(),
-//                nowSymbol.getConnectCircle()[circleIndex].getCenterY());
-//        double distance = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
-//        for(int i = 0; i < nowSymbol.getConnectCircle().length; i++){
-//            pointInParent = nowSymbol.localToParent(nowSymbol.getConnectCircle()[i].getCenterX(),
-//                    nowSymbol.getConnectCircle()[i].getCenterY());
-//
-//            double length = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
-//            if(length < distance){
-//                circleIndex = i;
-//            }
-//        }
-
         AbstractSymbol nowSymbol = null;
         int circleIndex = 0;
         double distance = GlobalConfig.MAX_NUMBER;
         Point2D pointInParent;
         for(AbstractSymbol symbol: connectSymbol){
-            for(int i = 0; i < symbol.getConnectCircle().length; i++){
-                pointInParent = symbol.localToParent(symbol.getConnectCircle()[i].getCenterX(), symbol.getConnectCircle()[i].getCenterY());
+            for(int i = 0; i < symbol.getConnectCircleFrame().getConnectCircle().length; i++){
+                pointInParent = symbol.localToParent(symbol.getConnectCircleFrame().getConnectCircle()[i].getCenterX(), symbol.getConnectCircleFrame().getConnectCircle()[i].getCenterY());
                 double length = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
                 if(length < distance){
                     nowSymbol = symbol;
@@ -241,5 +162,13 @@ public class SymbolManage {
             connect.setCircleIndex(circleIndex);
             connect.connect();
         }
+    }
+
+    public Selected getSelectedShape() {
+        return selectedShape;
+    }
+
+    public void setSelectedShape(Selected selectedShape) {
+        this.selectedShape = selectedShape;
     }
 }

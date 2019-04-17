@@ -1,10 +1,14 @@
-package Symbol;
+package Symbol.Line;
 
-import Symbol.Line.AbstractLine;
 import Symbol.Symbol.AbstractSymbol;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.shape.Circle;
 
+
+/**
+ *  该类对应着线条的一个点，symbol的一个连接圆
+ *  调用connect()方法绑定连接圆和点
+ *  调用unConnect()方法删除连接圆和点
+ */
 public class Connect {
 
     private int circleIndex;
@@ -17,6 +21,9 @@ public class Connect {
 
     private SimpleDoubleProperty lineY;
 
+    /**
+     * 标志位,判断是否已经用connect进行绑定
+     */
     private boolean isBind = false;
 
     public Connect(AbstractLine line) {
@@ -27,15 +34,17 @@ public class Connect {
         return symbol;
     }
 
+
+    /**
+     * 使用前确保symbol,lineX,lineY,circleIndex已经设置
+     */
     public void connect() {
-        lineX.bind(symbol.getConnectCircleCoorOfParent().get(2 * circleIndex));
-        lineY.bind(symbol.getConnectCircleCoorOfParent().get(2 * circleIndex + 1));
+        lineX.bind(symbol.getConnectCircleFrame().getConnectCircleCoorOfParent().get(2 * circleIndex));
+        lineY.bind(symbol.getConnectCircleFrame().getConnectCircleCoorOfParent().get(2 * circleIndex + 1));
         isBind = true;
     }
 
     public void unConnect() {
-//        lineX.unbindBidirectional(symbol.getConnectCircleCoorOfParent().get(2 * circleIndex));
-//        lineY.unbindBidirectional(symbol.getConnectCircleCoorOfParent().get(2 * circleIndex + 1));
         lineX.unbind();
         lineY.unbind();
         isBind = false;

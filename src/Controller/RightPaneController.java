@@ -85,7 +85,7 @@ public class RightPaneController extends Controller {
                  * 2、如果1不成立，取消所有选中
                  */
                 if (!inMyShape) {
-                    SymbolManage.getManage().removeAll(); //取消所有的选中
+                    SymbolManage.getManage().getSelectedShape().removeAll(); //取消所有的选中
                     Point2D point2D = rightPane.sceneToLocal(event.getSceneX(), event.getSceneY()); //转换坐标系
                     try {
                         /**
@@ -147,7 +147,7 @@ public class RightPaneController extends Controller {
                 }
                 Point2D eventPointInScene = rightPane.sceneToLocal(event.getSceneX(), event.getSceneY());
 
-                for (MShape myShape : SymbolManage.getManage().getSelectedShape()) {
+                for (MShape myShape : SymbolManage.getManage().getSelectedShape().getSelectedShape()) {
                     double dragX = eventPointInScene.getX() - myShape.getCursorPoint().getX();
                     double dragY = eventPointInScene.getY() - myShape.getCursorPoint().getY();
                     if (!myShape.isLine()) {

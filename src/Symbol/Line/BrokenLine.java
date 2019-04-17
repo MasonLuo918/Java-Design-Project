@@ -6,7 +6,6 @@ import Symbol.GlobalConfig;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
@@ -16,23 +15,23 @@ import javafx.scene.shape.Circle;
 
 public class BrokenLine extends AbstractLine {
 
-    private Circle[] circles = new Circle[2];
 
     public BrokenLine(Pane drawPane){
+        super();
         setDrawPane(drawPane);
         setLineType(LineType.BROKEN_LINE);
         setStrokeWidth(2);
         setFill(null);
-        for(int i = 0; i < circles.length; i++){
-            circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
-            circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
+        for(int i = 0; i < getCircles().length; i++){
+            getCircles()[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
+            getCircles()[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
         }
-        startX.set((getDrawPane().getWidth() - getLineLength()) / 2);
-        startY.set(getDrawPane().getHeight() / 2);
-        endX.set((getDrawPane().getWidth() + getLineLength()) / 2);
-        endY.set(getDrawPane().getHeight() / 2 + getLineLength());
-        middleX.bind(endX);
-        middleY.bind(startY);
+        setStartX((getDrawPane().getWidth() - getLineLength()) / 2);
+        setStartY(getDrawPane().getHeight() / 2);
+        setEndX((getDrawPane().getWidth() + getLineLength()) / 2);
+        setEndY(getDrawPane().getHeight() / 2 + getLineLength());
+        middleXProperty().bind(endX);
+        middleYProperty().bind(startY);
         updateLine();
         drawOperationFrame();
         initEvent();
@@ -41,25 +40,11 @@ public class BrokenLine extends AbstractLine {
     }
 
     @Override
-    public void showOperationFrame() {
-        for(Circle circle:circles){
-            getDrawPane().getChildren().add(circle);
-        }
-    }
-
-    @Override
-    public void hideOperationFrame() {
-        for(Circle circle:circles){
-            getDrawPane().getChildren().remove(circle);
-        }
-    }
-
-    @Override
     public void select(MouseEvent event) {
         if(event.isControlDown()){
-            SymbolManage.getManage().addMore(this);
+            SymbolManage.getManage().getSelectedShape().addMore(this);
         }else{
-            SymbolManage.getManage().add(this);
+            SymbolManage.getManage().getSelectedShape().add(this);
         }
     }
 
@@ -126,26 +111,8 @@ public class BrokenLine extends AbstractLine {
     }
 
     @Override
-    public boolean containsPointInScene(double x, double y) {
-        boolean inOperationCircle = false;
-        for(Circle circle: circles){
-            Bounds local = circle.getBoundsInLocal();
-            Bounds scene = circle.localToScene(local);
-            if(scene.contains(x, y)){
-                inOperationCircle = true;
-                break;
-            }
-        }
-        if(!inOperationCircle){
-            return getBoundsInScene().contains(x,y);
-        }else{
-            return false;
-        }
-    }
-
-    @Override
     public void initOperationFrameEvent() {
-        for(Circle circle:circles){
+        for(Circle circle:getCircles()){
             circle.setOnMouseEntered(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
@@ -153,15 +120,15 @@ public class BrokenLine extends AbstractLine {
                 }
             });
         }
-        circles[0].setOnMousePressed(new EventHandler<MouseEvent>() {
+        getCircles()[0].setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if(getStartConnect().isBind()){
-                    getEndConnect().unConnect();
+                    getStartConnect().unConnect();
                 }
             }
         });
-        circles[1].setOnMousePressed(new EventHandler<MouseEvent>() {
+        getCircles()[1].setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if(getEndConnect().isBind()){
@@ -170,49 +137,41 @@ public class BrokenLine extends AbstractLine {
             }
         });
 
-        circles[0].setOnMouseDragged(new EventHandler<MouseEvent>() {
+        getCircles()[0].setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
-                setStartX(MouseInParent.getX());
-                setStartY(MouseInParent.getY());
-                SymbolManage.getManage().detectLineEnter(startX.get(), startY.get());
+                    Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
+                    setStartX(MouseInParent.getX());
+                    setStartY(MouseInParent.getY());
+                    SymbolManage.getManage().detectLineEnter(getStartX(), getStartY());
             }
         });
-        circles[1].setOnMouseDragged(new EventHandler<MouseEvent>() {
+        getCircles()[1].setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 Point2D MouseInParent = sceneToParent(event.getSceneX(), event.getSceneY());
                 setEndX(MouseInParent.getX());
                 setEndY(MouseInParent.getY());
-                SymbolManage.getManage().detectLineEnter(endX.get(),endY.get());
+                SymbolManage.getManage().detectLineEnter(getEndX(),getEndY());
             }
         });
-        circles[0].setOnMouseReleased(new EventHandler<MouseEvent>() {
+        getCircles()[0].setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Point2D point = localToParent(circles[1].getCenterX(), circles[1].getCenterY());
+                Point2D point = localToParent(getCircles()[1].getCenterX(), getCircles()[1].getCenterY());
                 SymbolManage.getManage().connect(BrokenLine.this, getStartConnect());
                 SymbolManage.getManage().removeAllConnectSymbol();
             }
         });
 
-        circles[1].setOnMouseReleased(new EventHandler<MouseEvent>() {
+        getCircles()[1].setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Point2D point = localToParent(circles[1].getCenterX(), circles[1].getCenterY());
+                Point2D point = localToParent(getCircles()[1].getCenterX(), getCircles()[1].getCenterY());
                 SymbolManage.getManage().connect(BrokenLine.this, getEndConnect());
                 SymbolManage.getManage().removeAllConnectSymbol();
             }
         });
-    }
-
-    @Override
-    public void drawOperationFrame() {
-        circles[0].setCenterX(getStartX());
-        circles[0].setCenterY(getStartY());
-        circles[1].setCenterX(getEndX());
-        circles[1].setCenterY(getEndY());
     }
 
     @Override
@@ -247,6 +206,6 @@ public class BrokenLine extends AbstractLine {
 
         getPoints().clear();
         getPoints().addAll(x1, y1, x3, y3, x4, y4, x1, y1, x3 ,y3, x2, y2,middleX, middleY, x5, y5, x6 , y6, x7, y7, x8, y8, x5, y5);
-//
+
     }
 }

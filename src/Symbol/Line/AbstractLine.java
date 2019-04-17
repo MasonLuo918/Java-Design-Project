@@ -1,18 +1,20 @@
 package Symbol.Line;
 
-import Symbol.Connect;
+import Symbol.GlobalConfig;
 import Symbol.MShape;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 import javafx.scene.text.Text;
 
 public abstract class AbstractLine extends Polyline implements MShape {
+
+    private Circle[] circles = new Circle[2];
 
     private Pane drawPane;
 
@@ -55,10 +57,37 @@ public abstract class AbstractLine extends Polyline implements MShape {
     SimpleDoubleProperty middleY = new SimpleDoubleProperty();
 
     public AbstractLine(){
+        for(int i = 0; i < circles.length; i++){
+            circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
+            circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
+            circles[i].setCursor(Cursor.E_RESIZE);
+        }
         startConnect.setLineXProperty(startX);
         startConnect.setLineYProperty(startY);
         endConnect.setLineXProperty(endX);
         endConnect.setLineYProperty(endY);
+    }
+
+    @Override
+    public void showOperationFrame() {
+        for(Circle circle:circles){
+            getDrawPane().getChildren().add(circle);
+        }
+    }
+
+    @Override
+    public void hideOperationFrame() {
+        for(Circle circle:circles){
+            getDrawPane().getChildren().remove(circle);
+        }
+    }
+
+    @Override
+    public void drawOperationFrame() {
+        circles[0].setCenterX(startX.get());
+        circles[0].setCenterY(startY.get());
+        circles[1].setCenterX(endX.get());
+        circles[1].setCenterY(endY.get());
     }
 
     public Pane getDrawPane() {
@@ -153,6 +182,24 @@ public abstract class AbstractLine extends Polyline implements MShape {
     @Override
     public void setTextListenerEvent() {
 
+    }
+
+    @Override
+    public boolean containsPointInScene(double x, double y) {
+        boolean inOperationCircle = false;
+        for(Circle circle: circles){
+            Bounds toLocal = circle.getBoundsInLocal();
+            Bounds toScene = circle.localToScene(toLocal);
+            if(toScene.contains(x, y)){
+                inOperationCircle = true;
+                break;
+            }
+        }
+        if(!inOperationCircle){
+            return getBoundsInScene().contains(x,y);
+        }else{
+            return false;
+        }
     }
 
     public double getStartX() {
@@ -275,4 +322,11 @@ public abstract class AbstractLine extends Polyline implements MShape {
         this.endConnect = endConnect;
     }
 
+    public Circle[] getCircles() {
+        return circles;
+    }
+
+    public void setCircles(Circle[] circles) {
+        this.circles = circles;
+    }
 }

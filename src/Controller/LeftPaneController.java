@@ -3,7 +3,9 @@ package Controller;
 import Main.MainApp;
 import Manager.SymbolManage;
 import Symbol.*;
+import Symbol.Line.AbstractLine;
 import Symbol.Line.BrokenLine;
+import Symbol.Line.LineType;
 import Symbol.Line.StraightLine;
 import Symbol.Symbol.*;
 import javafx.event.EventHandler;
@@ -71,55 +73,78 @@ public class LeftPaneController extends Controller {
         StraightLine straightLine = new StraightLine(vbox);
         BrokenLine brokenLine = new BrokenLine(vbox);
 
-        /**
-         * 添加线条的事件
-         */
-        straightLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                /**
-                 * 如果只是单击一次，就添加至选中
-                 */
-                if(event.getClickCount() == 1){
-                    SymbolManage.getManage().cancelSelected();
-                    StraightLine newLine = new StraightLine(getMainApp().getRightPane());
-                    getMainApp().getRightPane().getChildren().remove(newLine);
-                    SymbolManage.getManage().setLeftPaneSelected(newLine);
-                }
-                /**
-                 * 单击两次，直接添加到rightPane中间
-                 */
-                if(event.getClickCount() == 2){
-                    StraightLine line = new StraightLine(getMainApp().getRightPane());
-                    SymbolManage.getManage().cancelSelected();
-                }
-            }
-        });
+        straightLine.setOnMouseClicked(new LineClickEvent());
+        brokenLine.setOnMouseClicked(new LineClickEvent());
 
-
-        brokenLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                /**
-                 * 如果只是单击一次，就添加至选中
-                 */
-                if(event.getClickCount() == 1){
-                    SymbolManage.getManage().cancelSelected();
-                    BrokenLine newLine = new BrokenLine(getMainApp().getRightPane());
-                    getMainApp().getRightPane().getChildren().remove(newLine);
-                    SymbolManage.getManage().setLeftPaneSelected(newLine);
-                }
-                /**
-                 * 单击两次，直接添加到rightPane中间
-                 */
-                if(event.getClickCount() == 2){
-                    BrokenLine line = new BrokenLine(getMainApp().getRightPane());
-                    SymbolManage.getManage().cancelSelected();
-                }
-            }
-        });
+//        /**
+//         * 添加线条的事件
+//         */
+//        straightLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                /**
+//                 * 如果只是单击一次，就添加至选中
+//                 */
+//                if (event.getClickCount() == 1) {
+//                    SymbolManage.getManage().cancelSelected();
+//                    StraightLine newLine = new StraightLine(getMainApp().getRightPane());
+//                    getMainApp().getRightPane().getChildren().remove(newLine);
+//                    SymbolManage.getManage().setLeftPaneSelected(newLine);
+//                }
+//                /**
+//                 * 单击两次，直接添加到rightPane中间
+//                 */
+//                if (event.getClickCount() == 2) {
+//                    StraightLine line = new StraightLine(getMainApp().getRightPane());
+//                    SymbolManage.getManage().cancelSelected();
+//                }
+//            }
+//        });
+//
+//
+//        brokenLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                /**
+//                 * 如果只是单击一次，就添加至选中
+//                 */
+//                if (event.getClickCount() == 1) {
+//
+//                }
+//                /**
+//                 * 单击两次，直接添加到rightPane中间
+//                 */
+//                if (event.getClickCount() == 2) {
+//                    BrokenLine line = new BrokenLine(getMainApp().getRightPane());
+//                }
+//            }
+//        });
 
         leftPane.setContent(vbox);
+    }
+
+
+    /**
+     * 添加symbol到rightPane
+     *
+     * @param mshape
+     */
+    public void addToRightPane(MShape mshape) {
+        Pane rightPane = mainApp.getRightPane();
+        rightPane.getChildren().add((Node) mshape);
+        if (!mshape.isLine()) {
+            AbstractSymbol symbol = (AbstractSymbol) mshape;
+            symbol.setLayoutX(rightPane.getWidth() / 2 - symbol.getPrefWidth() / 2);
+            symbol.setLayoutY(rightPane.getHeight() / 2 - symbol.getPrefHeight() / 2);
+        }
+    }
+
+    public MainApp getMainApp() {
+        return mainApp;
+    }
+
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
     }
 
     /**
@@ -135,43 +160,51 @@ public class LeftPaneController extends Controller {
             /**
              * 单击一次，根据反射机制新建symbol，添加为选中
              */
-            try{
+            try {
                 Class<?> clz = Class.forName(className);
-                mShape = (MShape)clz.newInstance();
-                if(event.getClickCount() == 1){
+                mShape = (MShape) clz.newInstance();
+                if (event.getClickCount() == 1) {
                     SymbolManage.getManage().cancelSelected();
                     SymbolManage.getManage().setLeftPaneSelected(mShape);
                 }
                 /**
                  * 单击两次，直接添加到rightPane中间
                  */
-                if(event.getClickCount() == 2){
+                if (event.getClickCount() == 2) {
                     addToRightPane(mShape);
                     SymbolManage.getManage().cancelSelected();
                 }
-            }catch (Exception e){}
+            } catch (Exception e) {
+            }
         }
     }
 
-    /**
-     * 添加symbol到rightPane
-     * @param mshape
-     */
-    public void addToRightPane(MShape mshape){
-        Pane rightPane = mainApp.getRightPane();
-        rightPane.getChildren().add((Node)mshape);
-        if(!mshape.isLine()){
-            AbstractSymbol symbol = (AbstractSymbol) mshape;
-            symbol.setLayoutX(rightPane.getWidth() / 2 - symbol.getPrefWidth() / 2);
-            symbol.setLayoutY(rightPane.getHeight() / 2 - symbol.getPrefHeight() / 2);
+    class LineClickEvent implements EventHandler<MouseEvent> {
+
+        @Override
+        public void handle(MouseEvent event) {
+            AbstractLine line = (AbstractLine) event.getSource();
+            AbstractLine newLine = null;
+            switch (line.getLineType()) {
+                case LineType.STRAIGHT_LINE:
+                    newLine = new StraightLine(LeftPaneController.this.getMainApp().getRightPane());
+                    break;
+                case LineType.BROKEN_LINE:
+                    newLine = new BrokenLine(LeftPaneController.this.getMainApp().getRightPane());
+                    break;
+                default:
+                    break;
+            }
+            LeftPaneController.this.getMainApp().getRightPane().getChildren().remove(newLine);
+            if(event.getClickCount() == 1){
+                SymbolManage.getManage().cancelSelected();
+                getMainApp().getRightPane().getChildren().remove(newLine);
+                SymbolManage.getManage().setLeftPaneSelected(newLine);
+            }
+            if(event.getClickCount() == 2){
+                SymbolManage.getManage().cancelSelected();
+                LeftPaneController.this.getMainApp().getRightPane().getChildren().add(newLine);
+            }
         }
-    }
-
-    public MainApp getMainApp() {
-        return mainApp;
-    }
-
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
     }
 }
