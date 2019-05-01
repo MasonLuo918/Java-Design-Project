@@ -1,7 +1,7 @@
 package Symbol.Line;
 
 import Manager.SymbolManage;
-import MathUtil.MathUtil;
+import Util.MathUtil;
 import Symbol.GlobalConfig;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -10,15 +10,13 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 
 /**
- *  使用前必须先setDrawPane
+ * 使用前必须先setDrawPane
  */
 public class StraightLine extends AbstractLine {
 
-
-    public StraightLine(Pane drawPane){
+    public StraightLine(Pane drawPane) {
         super();
         setDrawPane(drawPane);
         setLineType(LineType.STRAIGHT_LINE);
@@ -38,9 +36,9 @@ public class StraightLine extends AbstractLine {
 
     @Override
     public void select(MouseEvent event) {
-        if(event.isControlDown()){
+        if (event.isControlDown()) {
             SymbolManage.getManage().getSelectedShape().addMore(this);
-        }else{
+        } else {
             SymbolManage.getManage().getSelectedShape().add(this);
         }
     }
@@ -97,7 +95,7 @@ public class StraightLine extends AbstractLine {
         getCircles()[0].setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(getStartConnect().isBind()){
+                if (getStartConnect().isBind()) {
                     getStartConnect().unConnect();
                 }
             }
@@ -106,7 +104,7 @@ public class StraightLine extends AbstractLine {
         getCircles()[1].setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(getEndConnect().isBind()){
+                if (getEndConnect().isBind()) {
                     getEndConnect().unConnect();
                 }
             }
@@ -136,7 +134,7 @@ public class StraightLine extends AbstractLine {
             public void handle(MouseEvent event) {
                 Point2D point = localToParent(getCircles()[1].getCenterX(), getCircles()[1].getCenterY());
                 SymbolManage.getManage().connect(StraightLine.this, getStartConnect());
-                SymbolManage.getManage().removeAllConnectSymbol();
+                SymbolManage.getManage().getConnectManager().removeAllConnectSymbol();
             }
         });
         getCircles()[1].setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -144,7 +142,7 @@ public class StraightLine extends AbstractLine {
             public void handle(MouseEvent event) {
                 Point2D point = localToParent(getCircles()[1].getCenterX(), getCircles()[1].getCenterY());
                 SymbolManage.getManage().connect(StraightLine.this, getEndConnect());
-                SymbolManage.getManage().removeAllConnectSymbol();
+                SymbolManage.getManage().getConnectManager().removeAllConnectSymbol();
             }
         });
 
@@ -170,6 +168,5 @@ public class StraightLine extends AbstractLine {
         double y5 = y2 + GlobalConfig.ARROW_LENGTH / 2 * Math.cos(arc);
         getPoints().clear();
         getPoints().addAll(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x2, y2);
-
     }
 }

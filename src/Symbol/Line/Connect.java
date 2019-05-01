@@ -1,5 +1,6 @@
 package Symbol.Line;
 
+import Symbol.GlobalConfig;
 import Symbol.Symbol.AbstractSymbol;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -21,6 +22,8 @@ public class Connect {
 
     private SimpleDoubleProperty lineY;
 
+//    private boolean isStartPoint = true;
+
     /**
      * 标志位,判断是否已经用connect进行绑定
      */
@@ -39,6 +42,17 @@ public class Connect {
      * 使用前确保symbol,lineX,lineY,circleIndex已经设置
      */
     public void connect() {
+//        if(line.getEndX() == lineX.get() && line.getEndY() == lineY.get()){
+//            isStartPoint = false;
+//        }
+//        if(line.getLineType() == LineType.BROKEN_LINE){
+//            BrokenLine newLine = (BrokenLine)line;
+//            if(isStartPoint){
+//                newLine.setStartPointArrowType(circleIndex);
+//            }else{
+//                newLine.setEndPointArrowType(circleIndex);
+//            }
+//        }
         lineX.bind(symbol.getConnectCircleFrame().getConnectCircleCoorOfParent().get(2 * circleIndex));
         lineY.bind(symbol.getConnectCircleFrame().getConnectCircleCoorOfParent().get(2 * circleIndex + 1));
         isBind = true;

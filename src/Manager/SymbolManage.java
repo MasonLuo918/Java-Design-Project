@@ -2,17 +2,15 @@ package Manager;
 
 
 import Main.MainApp;
-import MathUtil.MathUtil;
-import Symbol.Line.Connect;
+import Util.MathUtil;
 import Symbol.GlobalConfig;
 import Symbol.Line.AbstractLine;
 import Symbol.MShape;
 import Symbol.Symbol.AbstractSymbol;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import Symbol.Line.Connect;
 
 
 /**
@@ -34,10 +32,9 @@ public class SymbolManage {
      */
     private boolean isOperationDrag = false;
 
-    private Selected selectedShape = new Selected();
+    private SelectedManager selectedManager = new SelectedManager();
 
-    private ObservableList<AbstractSymbol> connectSymbol = FXCollections.observableArrayList();
-
+    private ConnectManager connectManager = new ConnectManager();
     private MainApp mainApp;
 
     /**
@@ -93,32 +90,10 @@ public class SymbolManage {
      * 删除事件，删除右边面板选中的图形
      */
     public void deleteSelectedShapeFromRightPane() {
-        for (MShape mShape : selectedShape.getSelectedShape()) {
+        for (MShape mShape : selectedManager.getSelectedShape()) {
             mainApp.getRightPane().getChildren().remove(mShape);
         }
-        selectedShape.removeAll();
-    }
-
-
-    public void addConnectSymbol(AbstractSymbol symbol){
-        if(!connectSymbol.contains(symbol)){
-            connectSymbol.add(symbol);
-            symbol.showConnectCircle();
-        }
-    }
-
-    public void removeConnectSymbol(AbstractSymbol symbol){
-        if(connectSymbol.contains(symbol)){
-            connectSymbol.remove(symbol);
-            symbol.hideConnectCircle();
-        }
-    }
-
-    public void removeAllConnectSymbol(){
-        for(AbstractSymbol symbol:connectSymbol){
-            symbol.hideConnectCircle();
-        }
-        connectSymbol.removeAll();
+        selectedManager.removeAll();
     }
 
     /**
@@ -133,9 +108,9 @@ public class SymbolManage {
                 Bounds bounds = symbol.getBoundsInParent();
                 if(bounds.getMinX() - GlobalConfig.ENTER_WIDTH < x && bounds.getMinY() - GlobalConfig.ENTER_WIDTH < y
                         && bounds.getMaxX() + GlobalConfig.ENTER_WIDTH > x && bounds.getMaxY() + GlobalConfig.ENTER_WIDTH > y){
-                    addConnectSymbol(symbol);
+                    connectManager.addConnectSymbol(symbol);
                 }else{
-                    removeConnectSymbol(symbol);
+                    connectManager.removeConnectSymbol(symbol);
                 }
             }
         }
@@ -146,7 +121,7 @@ public class SymbolManage {
         int circleIndex = 0;
         double distance = GlobalConfig.MAX_NUMBER;
         Point2D pointInParent;
-        for(AbstractSymbol symbol: connectSymbol){
+        for(AbstractSymbol symbol: connectManager.getConnectSymbol()){
             for(int i = 0; i < symbol.getConnectCircleFrame().getConnectCircle().length; i++){
                 pointInParent = symbol.localToParent(symbol.getConnectCircleFrame().getConnectCircle()[i].getCenterX(), symbol.getConnectCircleFrame().getConnectCircle()[i].getCenterY());
                 double length = MathUtil.distance(connect.getLineX(), connect.getLineY(), pointInParent.getX(), pointInParent.getY());
@@ -157,18 +132,38 @@ public class SymbolManage {
                 }
             }
         }
-        if(!connectSymbol.isEmpty()){
+        if(!connectManager.getConnectSymbol().isEmpty()){
             connect.setSymbol(nowSymbol);
             connect.setCircleIndex(circleIndex);
             connect.connect();
         }
     }
 
-    public Selected getSelectedShape() {
-        return selectedShape;
+    public SelectedManager getSelectedShape() {
+        return selectedManager;
     }
 
-    public void setSelectedShape(Selected selectedShape) {
-        this.selectedShape = selectedShape;
+    public void setSelectedShape(SelectedManager selectedManager) {
+        this.selectedManager = selectedManager;
+    }
+
+    public static void setManage(SymbolManage manage) {
+        SymbolManage.manage = manage;
+    }
+
+    public SelectedManager getSelectedManager() {
+        return selectedManager;
+    }
+
+    public void setSelectedManager(SelectedManager selectedManager) {
+        this.selectedManager = selectedManager;
+    }
+
+    public ConnectManager getConnectManager() {
+        return connectManager;
+    }
+
+    public void setConnectManager(ConnectManager connectManager) {
+        this.connectManager = connectManager;
     }
 }

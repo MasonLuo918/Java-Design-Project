@@ -1,10 +1,9 @@
 package Symbol;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;
-
-import java.awt.*;
 
 public interface MShape {
     /**
@@ -63,11 +62,13 @@ public interface MShape {
 
     public Point2D getCursorPoint();
 
-    public void showTextArea();
+    public void showTextArea() throws JsonProcessingException;
 
     public void hideTextArea();
 
     public void updateText();
 
     public void setTextListenerEvent();
+
+    public String toJson() throws JsonProcessingException;
 }

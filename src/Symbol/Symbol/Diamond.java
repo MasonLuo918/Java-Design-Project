@@ -128,4 +128,10 @@ public class Diamond extends AbstractSymbol{
         double y = getPrefHeight() / 2 - bounds.getHeight();
         text.setY(y / 2 + getTextHeight());
     }
+
+
+    @Override
+    public void initSymbolType(){
+        setSymbolType(SymbolType.DIAMOND);
+    }
 }

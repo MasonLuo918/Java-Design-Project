@@ -75,51 +75,6 @@ public class LeftPaneController extends Controller {
 
         straightLine.setOnMouseClicked(new LineClickEvent());
         brokenLine.setOnMouseClicked(new LineClickEvent());
-
-//        /**
-//         * 添加线条的事件
-//         */
-//        straightLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event) {
-//                /**
-//                 * 如果只是单击一次，就添加至选中
-//                 */
-//                if (event.getClickCount() == 1) {
-//                    SymbolManage.getManage().cancelSelected();
-//                    StraightLine newLine = new StraightLine(getMainApp().getRightPane());
-//                    getMainApp().getRightPane().getChildren().remove(newLine);
-//                    SymbolManage.getManage().setLeftPaneSelected(newLine);
-//                }
-//                /**
-//                 * 单击两次，直接添加到rightPane中间
-//                 */
-//                if (event.getClickCount() == 2) {
-//                    StraightLine line = new StraightLine(getMainApp().getRightPane());
-//                    SymbolManage.getManage().cancelSelected();
-//                }
-//            }
-//        });
-//
-//
-//        brokenLine.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event) {
-//                /**
-//                 * 如果只是单击一次，就添加至选中
-//                 */
-//                if (event.getClickCount() == 1) {
-//
-//                }
-//                /**
-//                 * 单击两次，直接添加到rightPane中间
-//                 */
-//                if (event.getClickCount() == 2) {
-//                    BrokenLine line = new BrokenLine(getMainApp().getRightPane());
-//                }
-//            }
-//        });
-
         leftPane.setContent(vbox);
     }
 
@@ -148,7 +103,7 @@ public class LeftPaneController extends Controller {
     }
 
     /**
-     * Symbol 类的事件
+     * SymbolType 类的事件
      */
     class leftPaneEvent implements EventHandler<MouseEvent> {
 

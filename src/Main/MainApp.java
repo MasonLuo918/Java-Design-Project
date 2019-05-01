@@ -1,19 +1,29 @@
 package Main;
 
 import Controller.MainAppController;
+import FileMenu.Writer;
 import Manager.SymbolManage;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 
 public class MainApp extends Application {
 
@@ -59,11 +69,6 @@ public class MainApp extends Application {
          * 初始化菜单栏，分别有File，Edit，Help三个菜单
          */
         menuBar = new MenuBar();
-        Menu fileMenu = new Menu("File");
-        Menu editMenu = new Menu("Edit");
-        Menu helpMenu = new Menu("Help");
-        menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
-
         rootLayout.setTop(menuBar);
         rootLayout.setCenter(rightPane);
         rootLayout.setLeft(leftPane);

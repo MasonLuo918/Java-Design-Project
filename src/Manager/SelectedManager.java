@@ -4,7 +4,7 @@ import Symbol.MShape;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class Selected {
+public class SelectedManager {
 
     /*
      *  shape设置为选中状态时，添加入这里，selectedShape里面所有的shape都处于选中状态,

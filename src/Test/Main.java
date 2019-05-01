@@ -1,33 +1,36 @@
 package Test;
 
 import javafx.application.Application;
-import javafx.geometry.Bounds;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.*;
 
 public class Main extends Application {
 
-    public static void main(String[] args){
-        launch(args);
+    public static void main(String[] args) throws IOException {
+
+        File file = new File("/Users/belle/Desktop/flowChart.fc");
+        FileReader fileReader = new FileReader(file);
+        BufferedReader reader = new BufferedReader(fileReader);
+        StringBuffer json = new StringBuffer();
+        String string;
+        while((string = reader.readLine()) != null){
+            json.append(string);
+        }
+        System.out.println(json.toString());
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Pane pane = new Pane();
-        Text text = new Text("你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好");
-        pane.getChildren().add(text);
-        Scene scene = new Scene(pane,400,400);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-        text.setWrappingWidth(pane.getWidth());
-        text.setTextAlignment(TextAlignment.CENTER);
-        Bounds bounds = text.getBoundsInParent();
-        double height = bounds.getHeight();
-        text.setY(pane.getHeight() / 2 - height);
+        Pane root = new Pane();
+        root.setPrefSize(500,500);
+
+        Button button = new Button("打开文件");
+        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

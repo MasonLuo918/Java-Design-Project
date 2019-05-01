@@ -2,6 +2,10 @@ package Symbol.Line;
 
 import Symbol.GlobalConfig;
 import Symbol.MShape;
+import Symbol.SymbolBeans.LineBean;
+import Util.UUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -44,6 +48,9 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     private Connect endConnect = new Connect(this);
 
+    private String uuid;
+
+    private LineBean lineBean = new LineBean();
     SimpleDoubleProperty startX = new SimpleDoubleProperty();
 
     SimpleDoubleProperty startY = new SimpleDoubleProperty();
@@ -57,6 +64,7 @@ public abstract class AbstractLine extends Polyline implements MShape {
     SimpleDoubleProperty middleY = new SimpleDoubleProperty();
 
     public AbstractLine(){
+        setUuid(UUID.getUUID());
         for(int i = 0; i < circles.length; i++){
             circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
             circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
@@ -88,6 +96,16 @@ public abstract class AbstractLine extends Polyline implements MShape {
         circles[0].setCenterY(startY.get());
         circles[1].setCenterX(endX.get());
         circles[1].setCenterY(endY.get());
+    }
+
+    public void setUserBean(LineBean bean){
+        setLineType(bean.getLineType());
+        getText().setText(bean.getText());
+        setUuid(bean.getUuid());
+        setStartX(bean.getStartX());
+        setStartY(bean.getStartY());
+        setEndX(bean.getEndX());
+        setEndY(bean.getEndY());
     }
 
     public Pane getDrawPane() {
@@ -328,5 +346,56 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     public void setCircles(Circle[] circles) {
         this.circles = circles;
+    }
+
+    public TextField getTextField() {
+        return textField;
+    }
+
+    public void setTextField(TextField textField) {
+        this.textField = textField;
+    }
+
+    public Text getText() {
+        return text;
+    }
+
+    public void setText(Text text) {
+        this.text = text;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public LineBean getLineBean() {
+        updateBean();
+        return lineBean;
+    }
+
+    public void setLineBean(LineBean lineBean) {
+        updateBean();
+        this.lineBean = lineBean;
+    }
+
+    public void updateBean(){
+        lineBean.setStartX(getStartX());
+        lineBean.setStartY(getStartY());
+        lineBean.setEndX(getEndX());
+        lineBean.setEndY(getEndY());
+        lineBean.setLineType(getLineType());
+        lineBean.setText(getText().getText());
+        lineBean.setUuid(getUuid());
+    }
+
+    @Override
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(getLineBean());
+        return json;
     }
 }

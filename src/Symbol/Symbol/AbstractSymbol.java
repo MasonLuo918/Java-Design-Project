@@ -5,6 +5,10 @@ import Symbol.Frame.ConnectCircleFrame;
 import Symbol.Frame.OperationFrame;
 import Symbol.GlobalConfig;
 import Symbol.MShape;
+import Symbol.SymbolBeans.SymbolBean;
+import Util.UUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
@@ -19,6 +23,20 @@ import javafx.scene.text.TextAlignment;
 
 public abstract class AbstractSymbol extends Pane implements MShape {
 
+    /*
+     * 生成一个唯一的uuid
+     */
+    private String uuid;
+
+    /*
+     * 设置形状的类型
+     */
+    private int symbolType;
+
+    /*
+     * beans 对象，用来保存
+     */
+    private SymbolBean symbolBean = new SymbolBean();
 
     /*
      * 操作框
@@ -51,7 +69,6 @@ public abstract class AbstractSymbol extends Pane implements MShape {
      */
     private Point2D cursorPoint;
 
-
     private TextArea textArea = new TextArea();
 
     private Text text = new Text("");
@@ -61,6 +78,9 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     }
 
     public void init() {
+        setUuid(UUID.getUUID()); //设置一个唯一的uuid
+//        System.out.println(getUuid());
+        initSymbolType();
         setPrefSize(GlobalConfig.PANE_WIDTH, GlobalConfig.PANE_HEIGHT);
         initTextHeight();
         text.setFont(GlobalConfig.FONT);
@@ -260,7 +280,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
     }
 
     @Override
-    public void showTextArea() {
+    public void showTextArea() throws JsonProcessingException {
         textArea.setPrefHeight(getPrefHeight());
         textArea.setPrefWidth(getPrefWidth());
         textArea.setWrapText(true);
@@ -300,6 +320,20 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         double y = getPrefHeight() - bounds.getHeight();
         text.setY(y / 2 + getTextHeight());
     }
+
+    public void setUserBean(SymbolBean beans){
+        setLayoutX(beans.getLayoutX());
+        setLayoutY(beans.getLayoutY());
+        setPrefHeight(beans.getHeight());
+        setPrefWidth(beans.getWidth());
+        setTranslateX(beans.getTranslateX());
+        setTranslateY(beans.getTranslateY());
+        setRotate(beans.getRotate());
+        setUuid(beans.getUuid());
+        getText().setText(beans.getText());
+        setSymbolType(beans.getSymbolType());
+    }
+    public abstract void initSymbolType();
 
     public void updateConnectCircleCoorInParent() {
         connectCircleFrame.updateConnectCircleCoorInParent();
@@ -345,6 +379,50 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         this.connectCircleFrame = connectCircleFrame;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public int getSymbolType() {
+        return symbolType;
+    }
+
+    public void setSymbolType(int symbolType) {
+        this.symbolType = symbolType;
+    }
+
+    public SymbolBean getSymbolBean() {
+        updateBeans();
+        return symbolBean;
+    }
+
+    public void setSymbolBean(SymbolBean symbolBean) {
+        this.symbolBean = symbolBean;
+    }
+
+    @Override
+    public String toJson() throws JsonProcessingException {
+        updateBeans();
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(getSymbolBean());
+        return json;
+    }
+    public void updateBeans(){
+        symbolBean.setLayoutX(getLayoutX());
+        symbolBean.setLayoutY(getLayoutY());
+        symbolBean.setHeight(getPrefHeight());
+        symbolBean.setWidth(getPrefWidth());
+        symbolBean.setSymbolType(getSymbolType());
+        symbolBean.setText(getText().getText());
+        symbolBean.setTranslateX(getTranslateX());
+        symbolBean.setTranslateY(getTranslateY());
+        symbolBean.setUuid(getUuid());
+        symbolBean.setRotate(getRotate());
+    }
     class PositionListener implements ChangeListener {
         @Override
         public void changed(ObservableValue observable, Object oldValue, Object newValue) {

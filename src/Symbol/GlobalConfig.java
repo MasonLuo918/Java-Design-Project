@@ -37,8 +37,17 @@ public interface GlobalConfig {
     public static final double ARROW_LENGTH = 10;
 
     public static final double MAX_NUMBER = 1000000000;
+
+    public static final int ARROW_TOP = 2;
+
+    public static final int ARROW_RIGHT = 3;
+
+    public static final int ARROW_BOTTOM = 0;
+
+    public static final int ARROW_LEFT = 1;
+
     /**
-     * 平行四边形缩紧距离
+     * 平行四边形缩进距离
      */
     public static final double IOFRAME_OFFSET = 30;
     /*

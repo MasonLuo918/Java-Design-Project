@@ -111,5 +111,12 @@ public class IOFrame extends AbstractSymbol {
         Bounds bounds = text.getBoundsInParent();
         double y = getPrefHeight() - bounds.getHeight();
         text.setY(y / 2 + getTextHeight());
+
+    }
+
+
+    @Override
+    public void initSymbolType(){
+        setSymbolType(SymbolType.IO_FRAME);
     }
 }

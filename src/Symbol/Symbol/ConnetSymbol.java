@@ -20,6 +20,11 @@ public class ConnetSymbol extends AbstractSymbol{
     }
 
 
+    @Override
+    public void initSymbolType(){
+        setSymbolType(SymbolType.CONNECT_SYMBOL);
+    }
+
     /**
      *  取消操作框，固定大小
      */

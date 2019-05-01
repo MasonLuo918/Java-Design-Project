@@ -1,7 +1,7 @@
 package Symbol.Frame;
 
 import Manager.SymbolManage;
-import MathUtil.MathUtil;
+import Util.MathUtil;
 import Symbol.GlobalConfig;
 import Symbol.Symbol.AbstractSymbol;
 import javafx.event.EventHandler;
@@ -129,8 +129,6 @@ public class OperationFrame {
         lines[4].setStartY(drawPane.getPrefHeight() - GlobalConfig.CIRCLE_RADIUS);
         lines[4].setEndX(0);
         lines[4].setEndY(0);
-
-
     }
 
     /**
@@ -150,7 +148,7 @@ public class OperationFrame {
                     symbolManage.setOperationDrag(true);
                     drawPane.setInitX(drawPane.getTranslateX());
                     drawPane.setInitY( drawPane.getTranslateY());
-                    drawPane.setCursorPoint( drawPane.sceneToParent(event.getSceneX(), event.getSceneY()));
+                    drawPane.setCursorPoint(drawPane.sceneToParent(event.getSceneX(), event.getSceneY()));
                 }
             });
 
@@ -201,6 +199,7 @@ public class OperationFrame {
         circles[1].setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+
                 Point2D mousePointInParent =  drawPane.sceneToParent(event.getSceneX(), event.getSceneY());
                 double dragX = mousePointInParent.getX() -  drawPane.getCursorPoint().getX();
                 double dragY = mousePointInParent.getY() -  drawPane.getCursorPoint().getY();

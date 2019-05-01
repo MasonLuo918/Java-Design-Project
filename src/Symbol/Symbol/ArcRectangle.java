@@ -17,4 +17,9 @@ public class ArcRectangle extends AbstractSymbol {
         rectangle.setStroke(GlobalConfig.SYMBOL_STROKE_COLOR);
         setMyShape(rectangle);
     }
+
+    @Override
+    public void initSymbolType(){
+        setSymbolType(SymbolType.ARC_RECTANGLE);
+    }
 }

@@ -99,4 +99,9 @@ public class NoteSymbol extends AbstractSymbol{
         }
         setMyShape(new Shape());
     }
+
+    @Override
+    public void initSymbolType(){
+        setSymbolType(SymbolType.NOTE_SYMBOL);
+    }
 }

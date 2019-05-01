@@ -29,6 +29,9 @@ public class MainAppController extends Controller {
         leftPaneController.setMainApp(mainApp); //设置mainApp，以便获取数据
         rightPaneController.setRightPane(mainApp.getRightPane());
         rightPaneController.setMainApp(mainApp);
+        MenuBarController menuBarController = new MenuBarController();
+        menuBarController.setMainApp(mainApp);
+        menuBarController.init();
         leftPaneController.init();
         rightPaneController.init();
     }

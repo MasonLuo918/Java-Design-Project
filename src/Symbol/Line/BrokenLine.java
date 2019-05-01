@@ -1,7 +1,7 @@
 package Symbol.Line;
 
 import Manager.SymbolManage;
-import MathUtil.MathUtil;
+import Util.MathUtil;
 import Symbol.GlobalConfig;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -14,7 +14,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class BrokenLine extends AbstractLine {
-
+//
+//    private SimpleIntegerProperty startPointArrowType = new SimpleIntegerProperty(GlobalConfig.ARROW_LEFT);
+//
+//    private SimpleIntegerProperty endPointArrowType = new SimpleIntegerProperty(GlobalConfig.ARROW_BOTTOM);
 
     public BrokenLine(Pane drawPane){
         super();
@@ -160,7 +163,7 @@ public class BrokenLine extends AbstractLine {
             public void handle(MouseEvent event) {
                 Point2D point = localToParent(getCircles()[1].getCenterX(), getCircles()[1].getCenterY());
                 SymbolManage.getManage().connect(BrokenLine.this, getStartConnect());
-                SymbolManage.getManage().removeAllConnectSymbol();
+                SymbolManage.getManage().getConnectManager().removeAllConnectSymbol();
             }
         });
 
@@ -169,7 +172,7 @@ public class BrokenLine extends AbstractLine {
             public void handle(MouseEvent event) {
                 Point2D point = localToParent(getCircles()[1].getCenterX(), getCircles()[1].getCenterY());
                 SymbolManage.getManage().connect(BrokenLine.this, getEndConnect());
-                SymbolManage.getManage().removeAllConnectSymbol();
+                SymbolManage.getManage().getConnectManager().removeAllConnectSymbol();
             }
         });
     }
@@ -207,5 +210,58 @@ public class BrokenLine extends AbstractLine {
         getPoints().clear();
         getPoints().addAll(x1, y1, x3, y3, x4, y4, x1, y1, x3 ,y3, x2, y2,middleX, middleY, x5, y5, x6 , y6, x7, y7, x8, y8, x5, y5);
 
+
+//        Point2D[] points1 = Util.getArrowPoint(startPointArrowType.get(), getStartX(), getStartY());
+//        Point2D[] points2 = Util.getArrowPoint(endPointArrowType.get(), getEndX(), getEndY());
+//        double x1 = getStartX();
+//        double y1 = getStartY();
+//        double x2 = points1[0].getX();
+//        double y2 = points1[0].getY();
+//        double x3 = points1[1].getX();
+//        double y3 = points1[1].getY();
+//        double x4 = getStartX();
+//        double y4 = getStartY();
+//        double x5 = points1[2].getX();
+//        double y5 = points1[2].getY();
+//
+//        double x6 = getMiddleX();
+//        double y6 = getMiddleY();
+//
+//        double x7 = points2[2].getX();
+//        double y7 = points2[2].getY();
+//        double x8 = points2[1].getX();
+//        double y8 = points2[1].getY();
+//        double x9 = getEndX();
+//        double y9 = getEndY();
+//        double x10 = points2[0].getX();
+//        double y10 = points2[0].getY();
+//        double x11 = points2[2].getX();
+//        double y11 = points2[2].getY();
+//        getPoints().clear();
+//        getPoints().addAll( x1, y1, x2, y2, x3, y3, x4, y4, x2, y2, x5, y5, x6, y6, x7, y7, x8, y8, x9, y9, x10, y10, x11, y11);
     }
+//
+//    public int getStartPointArrowType() {
+//        return startPointArrowType.get();
+//    }
+//
+//    public SimpleIntegerProperty startPointArrowTypeProperty() {
+//        return startPointArrowType;
+//    }
+//
+//    public void setStartPointArrowType(int startPointArrowType) {
+//        this.startPointArrowType.set(startPointArrowType);
+//    }
+//
+//    public int getEndPointArrowType() {
+//        return endPointArrowType.get();
+//    }
+//
+//    public SimpleIntegerProperty endPointArrowTypeProperty() {
+//        return endPointArrowType;
+//    }
+//
+//    public void setEndPointArrowType(int endPointArrowType) {
+//        this.endPointArrowType.set(endPointArrowType);
+//    }
 }
