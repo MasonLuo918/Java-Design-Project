@@ -71,4 +71,8 @@ public interface MShape {
     public void setTextListenerEvent();
 
     public String toJson() throws JsonProcessingException;
+
+    public String getUuid();
+
+    public void setUuid(String UUid);
 }

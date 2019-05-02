@@ -1,13 +1,12 @@
 package Symbol;
 
-import Symbol.Line.AbstractLine;
-import Symbol.Line.BrokenLine;
-import Symbol.Line.LineType;
-import Symbol.Line.StraightLine;
+import Symbol.Line.*;
 import Symbol.Symbol.*;
+import Symbol.SymbolBeans.ConnectBean;
 import Symbol.SymbolBeans.LineBean;
 import Symbol.SymbolBeans.SymbolBean;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
 import javax.sound.sampled.Line;
@@ -82,5 +81,36 @@ public class Generator {
         }
         line.setUserBean(lineBean);
         return line;
+    }
+
+    public static void generateConncet(String json, Pane drawPane){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ConnectBean connectBean = objectMapper.readValue(json, ConnectBean.class);
+            AbstractLine line = null;
+            AbstractSymbol symbol = null;
+            for(Node node:drawPane.getChildren()){
+                MShape mShape = (MShape)node;
+                if(mShape.getUuid().equals(connectBean.getLineUUID())){
+                    line = (AbstractLine) mShape;
+                }
+                if(mShape.getUuid().equals(connectBean.getSymbolUUID())){
+                    symbol = (AbstractSymbol) mShape;
+                }
+            }
+            if(line != null && symbol != null){
+                if(connectBean.isStartPoint()){
+                    line.getStartConnect().setCircleIndex(connectBean.getCircleIndex());
+                    line.getStartConnect().setSymbol(symbol);
+                    line.getStartConnect().connect();
+                }else{
+                    line.getEndConnect().setCircleIndex(connectBean.getCircleIndex());
+                    line.getEndConnect().setSymbol(symbol);
+                    line.getEndConnect().connect();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

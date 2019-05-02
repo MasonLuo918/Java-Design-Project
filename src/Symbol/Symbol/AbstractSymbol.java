@@ -379,10 +379,12 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         this.connectCircleFrame = connectCircleFrame;
     }
 
+    @Override
     public String getUuid() {
         return uuid;
     }
 
+    @Override
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }

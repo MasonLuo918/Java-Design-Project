@@ -2,6 +2,7 @@ package Symbol.Line;
 
 import Symbol.GlobalConfig;
 import Symbol.MShape;
+import Symbol.SymbolBeans.ConnectBean;
 import Symbol.SymbolBeans.LineBean;
 import Util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,6 +52,11 @@ public abstract class AbstractLine extends Polyline implements MShape {
     private String uuid;
 
     private LineBean lineBean = new LineBean();
+
+    private ConnectBean startBean = new ConnectBean();
+
+    private ConnectBean endBean = new ConnectBean();
+
     SimpleDoubleProperty startX = new SimpleDoubleProperty();
 
     SimpleDoubleProperty startY = new SimpleDoubleProperty();
@@ -65,6 +71,8 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     public AbstractLine(){
         setUuid(UUID.getUUID());
+        startConnect.setStartPoint(true);
+        endConnect.setStartPoint(false);
         for(int i = 0; i < circles.length; i++){
             circles[i] = new Circle(GlobalConfig.CIRCLE_RADIUS);
             circles[i].setFill(GlobalConfig.OPERATION_FRAME_CIRCLE_COLOR);
@@ -364,10 +372,12 @@ public abstract class AbstractLine extends Polyline implements MShape {
         this.text = text;
     }
 
+    @Override
     public String getUuid() {
         return uuid;
     }
 
+    @Override
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
@@ -397,5 +407,49 @@ public abstract class AbstractLine extends Polyline implements MShape {
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(getLineBean());
         return json;
+    }
+
+    public void updateConnectBean(){
+        startBean.setBind(startConnect.isBind());
+        startBean.setCircleIndex(startConnect.getCircleIndex());
+        startBean.setLineUUID(startConnect.getLine().getUuid());
+        startBean.setLineX(startConnect.getLineX());
+        startBean.setLineY(startConnect.getLineY());
+        startBean.setSymbolUUID(startConnect.getSymbol().getUuid());
+        startBean.setStartPoint(startConnect.isStartPoint());
+
+
+        endBean.setBind(endConnect.isBind());
+        endBean.setCircleIndex(endConnect.getCircleIndex());
+        endBean.setLineUUID(endConnect.getLine().getUuid());
+        endBean.setLineX(endConnect.getLineX());
+        endBean.setLineY(endConnect.getLineY());
+        endBean.setSymbolUUID(endConnect.getSymbol().getUuid());
+        endBean.setStartPoint(endConnect.isStartPoint());
+    }
+
+    public void setConnectUserBean(ConnectBean bean){
+        if(bean.isStartPoint()){
+            startConnect.setLineXProperty(startX);
+            startConnect.setLineYProperty(startY);
+            startConnect.setCircleIndex(bean.getCircleIndex());
+        }
+    }
+    public ConnectBean getStartBean() {
+        updateConnectBean();
+        return startBean;
+    }
+
+    public void setStartBean(ConnectBean startBean) {
+        this.startBean = startBean;
+    }
+
+    public ConnectBean getEndBean() {
+        updateConnectBean();
+        return endBean;
+    }
+
+    public void setEndBean(ConnectBean endBean) {
+        this.endBean = endBean;
     }
 }

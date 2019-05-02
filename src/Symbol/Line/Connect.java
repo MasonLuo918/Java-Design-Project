@@ -22,7 +22,7 @@ public class Connect {
 
     private SimpleDoubleProperty lineY;
 
-//    private boolean isStartPoint = true;
+    private boolean isStartPoint = true;
 
     /**
      * 标志位,判断是否已经用connect进行绑定
@@ -123,5 +123,13 @@ public class Connect {
 
     public void setBind(boolean bind) {
         isBind = bind;
+    }
+
+    public boolean isStartPoint() {
+        return isStartPoint;
+    }
+
+    public void setStartPoint(boolean startPoint) {
+        isStartPoint = startPoint;
     }
 }

@@ -18,11 +18,19 @@ public class Writer{
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode symbolArray = mapper.createArrayNode();
         ArrayNode lineArray = mapper.createArrayNode();
+        ArrayNode connectArray = mapper.createArrayNode();
         for(Node node:rightPane.getChildren()){
             MShape mShape = (MShape)node;
             if(mShape.isLine()){
                 AbstractLine line = (AbstractLine)mShape;
                 lineArray.addPOJO(line.getLineBean());
+
+                if(line.getStartConnect().isBind()){
+                    connectArray.addPOJO(line.getStartBean());
+                }
+                if(line.getEndConnect().isBind()){
+                    connectArray.addPOJO(line.getEndBean());
+                }
             }else{
                 AbstractSymbol symbol = (AbstractSymbol)mShape;
                 symbolArray.addPOJO(symbol.getSymbolBean());
@@ -31,8 +39,9 @@ public class Writer{
         ObjectNode root = mapper.createObjectNode();
         root.set("symbols",symbolArray);
         root.set("lines",lineArray);
+        root.set("connects",connectArray);
         String string = mapper.writeValueAsString(root);
-        System.out.println(string);
+//        System.out.println(string);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         fileOutputStream.write(string.getBytes());
         fileOutputStream.close();

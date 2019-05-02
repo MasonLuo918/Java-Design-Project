@@ -52,7 +52,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         initLayout();
-        scene = new Scene(rootLayout,900,600);
+        scene = new Scene(rootLayout,900,800);
         SymbolManage.getManage().setMainApp(this); //连接Manage和MainApp
         initController();
         primaryStage.setScene(scene);

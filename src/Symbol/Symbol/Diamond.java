@@ -109,9 +109,9 @@ public class Diamond extends AbstractSymbol{
         getText().textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if(getText().getBoundsInLocal().getHeight() > getTextArea().getHeight() - getTextHeight()){
-                    getText().setText(oldValue);
-                }
+//                if(getText().getBoundsInLocal().getHeight() > getTextArea().getHeight() - getTextHeight()){
+//                    getText().setText(oldValue);
+//                }
                 updateText();
             }
         });

@@ -4,10 +4,12 @@ import Main.MainApp;
 import Manager.SymbolManage;
 import Symbol.*;
 import Symbol.Line.AbstractLine;
+import Symbol.Line.Connect;
 import Symbol.Line.LineType;
 import Symbol.Symbol.AbstractSymbol;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.javah.Gen;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -228,8 +230,13 @@ public class RightPaneController extends Controller {
         for(JsonNode node:lines){
             AbstractLine line = Generator.generateLine(node.toString(),rightPane);
         }
+        JsonNode connects = jsonNode.path("connects");
+        for(JsonNode node:connects){
+            Generator.generateConncet(node.toString(), rightPane);
+        }
 
     }
+
     public Pane getRightPane() {
         return rightPane;
     }
