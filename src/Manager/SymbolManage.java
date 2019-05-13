@@ -35,6 +35,7 @@ public class SymbolManage {
     private SelectedManager selectedManager = new SelectedManager();
 
     private ConnectManager connectManager = new ConnectManager();
+
     private MainApp mainApp;
 
     /**

@@ -1,6 +1,7 @@
 package Test;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
@@ -9,29 +10,29 @@ import javafx.stage.Stage;
 
 import java.io.*;
 
-public class Main extends Application {
+public class Main{
 
     public static void main(String[] args) throws IOException {
+        SimpleDoubleProperty doubleProperty1 = new SimpleDoubleProperty();
 
-        File file = new File("/Users/belle/Desktop/flowChart.fc");
-        FileReader fileReader = new FileReader(file);
-        BufferedReader reader = new BufferedReader(fileReader);
-        StringBuffer json = new StringBuffer();
-        String string;
-        while((string = reader.readLine()) != null){
-            json.append(string);
-        }
-        System.out.println(json.toString());
-    }
+        SimpleDoubleProperty doubleProperty2 = new SimpleDoubleProperty();
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        Pane root = new Pane();
-        root.setPrefSize(500,500);
+        doubleProperty1.bind(doubleProperty2);
 
-        Button button = new Button("打开文件");
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Pane pane = new Pane();
+
+        pane.layoutXProperty().bind(pane.layoutYProperty());
+
+        pane.layoutXProperty().unbind();
+
+        doubleProperty2.set(10);
+
+        doubleProperty1.unbind();
+
+        System.out.println(doubleProperty1.get() + " " + doubleProperty2.get());
+
+        doubleProperty2.set(1);
+
+        System.out.println(doubleProperty1.get() + " " + doubleProperty2.get());
     }
 }

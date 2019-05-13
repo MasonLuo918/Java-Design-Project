@@ -1,5 +1,6 @@
 package Controller;
 
+import FileMenu.Exporter;
 import FileMenu.Reader;
 import FileMenu.Writer;
 import Main.MainApp;
@@ -32,8 +33,8 @@ public class MenuBarController extends Controller {
         MenuItem saveItem = new MenuItem("Save");
         MenuItem saveAsItem = new MenuItem("Save As");
         MenuItem openItem = new MenuItem("Open");
-        fileMenu.getItems().addAll(saveItem, saveAsItem, openItem);
-
+        MenuItem exportItem = new MenuItem("Export");
+        fileMenu.getItems().addAll(saveItem, saveAsItem, openItem,exportItem);
         saveItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -90,6 +91,20 @@ public class MenuBarController extends Controller {
                 }catch (IOException e){
                     e.printStackTrace();
                 }
+            }
+        });
+
+        exportItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                FileChooser fileChoose = new FileChooser();
+                fileChoose.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("png图片","*.png")
+                );
+                    File file = fileChoose.showSaveDialog(stage);
+                    if(file!=null){
+                        Exporter.export(file,getMainApp().getRightPane());
+                    }
             }
         });
     }
