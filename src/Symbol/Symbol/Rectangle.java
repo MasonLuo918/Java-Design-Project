@@ -2,8 +2,6 @@ package Symbol.Symbol;
 
 import Symbol.GlobalConfig;
 
-import java.io.Serializable;
-
 public class Rectangle extends AbstractSymbol {
 
     @Override

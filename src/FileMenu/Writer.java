@@ -20,6 +20,9 @@ public class Writer{
         ArrayNode lineArray = mapper.createArrayNode();
         ArrayNode connectArray = mapper.createArrayNode();
         for(Node node:rightPane.getChildren()){
+            if(!(node instanceof MShape)){
+                continue;
+            }
             MShape mShape = (MShape)node;
             if(mShape.isLine()){
                 AbstractLine line = (AbstractLine)mShape;

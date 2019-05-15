@@ -3,6 +3,7 @@ package Controller;
 import FileMenu.Exporter;
 import FileMenu.Reader;
 import FileMenu.Writer;
+import FileMenu.newPane;
 import Main.MainApp;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -31,10 +32,11 @@ public class MenuBarController extends Controller {
         menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
 
         MenuItem saveItem = new MenuItem("Save");
+        MenuItem newItem = new MenuItem("New");
         MenuItem saveAsItem = new MenuItem("Save As");
         MenuItem openItem = new MenuItem("Open");
         MenuItem exportItem = new MenuItem("Export");
-        fileMenu.getItems().addAll(saveItem, saveAsItem, openItem,exportItem);
+        fileMenu.getItems().addAll(newItem,saveItem, saveAsItem, openItem,exportItem);
         saveItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -105,6 +107,13 @@ public class MenuBarController extends Controller {
                     if(file!=null){
                         Exporter.export(file,getMainApp().getRightPane());
                     }
+            }
+        });
+
+        newItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                newPane.createNewPane(getMainApp().getRightPane());
             }
         });
     }

@@ -8,6 +8,8 @@ import Util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
@@ -82,6 +84,21 @@ public abstract class AbstractLine extends Polyline implements MShape {
         startConnect.setLineYProperty(startY);
         endConnect.setLineXProperty(endX);
         endConnect.setLineYProperty(endY);
+        textField.setPrefWidth(50);
+        textField.layoutXProperty().bind(startX);
+        textField.layoutYProperty().bind(startY);
+        textField.setPrefColumnCount(2);
+        text.xProperty().bind(startX);
+        text.yProperty().bind(startY.subtract(10));
+        textField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if(newValue.length() > 2){
+                    String value = newValue.substring(0,2);
+                   textField.setText(value);
+                }
+            }
+        });
     }
 
     @Override
@@ -114,6 +131,9 @@ public abstract class AbstractLine extends Polyline implements MShape {
         setStartY(bean.getStartY());
         setEndX(bean.getEndX());
         setEndY(bean.getEndY());
+        if(!drawPane.getChildren().contains(text)){
+            drawPane.getChildren().add(text);
+        }
     }
 
     public Pane getDrawPane() {
@@ -192,12 +212,17 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     @Override
     public void showTextArea() {
-
+        if(!drawPane.getChildren().contains(text)){
+            drawPane.getChildren().add(text);
+        }
+        textField.setText(text.getText());
+        drawPane.getChildren().add(textField);
     }
 
     @Override
     public void hideTextArea() {
-
+        text.setText(textField.getText());
+        drawPane.getChildren().remove(textField);
     }
 
     @Override
