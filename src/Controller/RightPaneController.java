@@ -27,6 +27,10 @@ public class RightPaneController extends Controller {
 
     private MainApp mainApp;
 
+    private AbstractSymbol[] copySymbol;
+
+    private Point2D point;
+
     private RightPaneController() {
 
     }
@@ -44,19 +48,21 @@ public class RightPaneController extends Controller {
         rightPane.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                Point2D point = new Point2D(event.getSceneX(), event.getSceneY());
+                RightPaneController.this.point = point;
                 boolean inMyShape = false; //标志位，判断是否在shape里面点击
                 try {
                     for (Node node : rightPane.getChildren()) {
                         /*
                          *  如果点击是在Symbol里的时候，选中
                          */
-                        if(!(node instanceof MShape)){
+                        if (!(node instanceof MShape)) {
                             continue;
                         }
                         MShape mShape = (MShape) node;
                         if (mShape.containsPointInScene(event.getSceneX(), event.getSceneY())) {
                             mShape.select(event);
-                            if(event.getClickCount() == 2){
+                            if (event.getClickCount() == 2) {
                                 mShape.showTextArea();
                             }
                             inMyShape = true;
@@ -80,6 +86,8 @@ public class RightPaneController extends Controller {
                             line.setLastStartY(line.getStartY());
                             line.setLastEndX(line.getEndX());
                             line.setLastEndY(line.getEndY());
+                            line.setLastMiddleX(line.getMiddleX());
+                            line.setLastMiddleY(line.getMiddleY());
                         }
                     }
                 } catch (Exception e) {
@@ -124,6 +132,14 @@ public class RightPaneController extends Controller {
                                         line.setStartY(point2D.getY());
                                         line.setEndX(line.getStartX() + line.getLineLength());
                                         line.setEndY(line.getStartY() + line.getLineLength());
+                                        break;
+                                    case LineType.DOUBLE_BROKEN_LINE:
+                                        line.setStartX(point2D.getX() - line.getLineLength() / 2);
+                                        line.setStartY(point2D.getY());
+                                        line.setEndX(point2D.getX() - line.getLineLength() / 2);
+                                        line.setEndY(point2D.getY() + line.getLineLength());
+                                        line.setMiddleX(line.getStartX() + line.getLineLength());
+                                        line.setMiddleY((line.getStartY() + line.getEndY()) / 2);
                                         break;
                                 }
                             }
@@ -171,16 +187,21 @@ public class RightPaneController extends Controller {
                         double newStartY = line.getLastStartY() + dragY;
                         double newEndX = line.getLastEndX() + dragX;
                         double newEndY = line.getLastEndY() + dragY;
+                        double newMiddleX = line.getLastMiddleX() + dragX;
+                        double newMiddleY = line.getLastMiddleY() + dragY;
                         /**
                          * 如果没有绑定，则可以设置新位置
                          */
-                        if(!line.getStartConnect().isBind() && !line.getEndConnect().isBind()){
+                        if (!line.getStartConnect().isBind() && !line.getEndConnect().isBind()) {
                             line.setStartX(newStartX);
                             line.setStartY(newStartY);
                             line.setEndX(newEndX);
                             line.setEndY(newEndY);
+                            if (line.getLineType() == LineType.DOUBLE_BROKEN_LINE) {
+                                line.setMiddleX(newMiddleX);
+                                line.setMiddleY(newMiddleY);
+                            }
                         }
-
                     }
                 }
             }
@@ -189,28 +210,57 @@ public class RightPaneController extends Controller {
         mainApp.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if(event.getCode().getName().equals(KeyCode.BACK_SPACE.getName())){
+                if (event.isControlDown()) {
+                    System.out.println("**");
+                    if (event.getCode().getName().equals(KeyCode.C.getName())) {
+                        RightPaneController.this.copySymbol = SymbolManage.getManage().copySelectedShapeFromRightPane();//返回复制的符号数组
+                    }
+                    if (event.getCode().getName().equals(KeyCode.V.getName())) {
+                        double y = RightPaneController.this.point.getY();
+                        double x = RightPaneController.this.point.getX();
+                        for (AbstractSymbol each : RightPaneController.this.copySymbol) {
+
+                            RightPaneController.this.rightPane.getChildren().add(each);
+                            RightPaneController.this.point = RightPaneController.this.copySymbol[0].sceneToParent(x, y);
+
+
+                            each.setLayoutX(RightPaneController.this.point.getX());
+                            each.setLayoutY(RightPaneController.this.point.getY());
+                            each.setTranslateX(0);
+                            each.setTranslateY(0);
+                        }
+                        //更新数组
+                        AbstractSymbol[] copySymbol = new AbstractSymbol[RightPaneController.this.copySymbol.length];
+                        int i = 0;
+                        for (AbstractSymbol each : RightPaneController.this.copySymbol) {
+
+                            copySymbol[i++] = Generator.getSymbol(each.getSymbolBean());
+                        }
+                        RightPaneController.this.copySymbol = copySymbol;
+                    }
+                } else if (event.getCode().getName().equals(KeyCode.BACK_SPACE.getName())) {
                     SymbolManage.getManage().deleteSelectedShapeFromRightPane();
                 }
             }
         });
     }
 
+
     public void generate(String json) throws IOException {
         rightPane.getChildren().clear();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         JsonNode symbols = jsonNode.path("symbols");
-        for(JsonNode node:symbols){
+        for (JsonNode node : symbols) {
             AbstractSymbol symbol = Generator.generateSymbol(node.toString());
             rightPane.getChildren().add(symbol);
         }
         JsonNode lines = jsonNode.path("lines");
-        for(JsonNode node:lines){
-            AbstractLine line = Generator.generateLine(node.toString(),rightPane);
+        for (JsonNode node : lines) {
+            AbstractLine line = Generator.generateLine(node.toString(), rightPane);
         }
         JsonNode connects = jsonNode.path("connects");
-        for(JsonNode node:connects){
+        for (JsonNode node : connects) {
             Generator.generateConncet(node.toString(), rightPane);
         }
 

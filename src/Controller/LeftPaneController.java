@@ -3,10 +3,7 @@ package Controller;
 import Main.MainApp;
 import Manager.SymbolManage;
 import Symbol.*;
-import Symbol.Line.AbstractLine;
-import Symbol.Line.BrokenLine;
-import Symbol.Line.LineType;
-import Symbol.Line.StraightLine;
+import Symbol.Line.*;
 import Symbol.Symbol.*;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -72,7 +69,8 @@ public class LeftPaneController extends Controller {
         vbox.getChildren().addAll(arcRectangle, rectangle, diamond, ioFrame, connetSymbol, noteSymbol);
         StraightLine straightLine = new StraightLine(vbox);
         BrokenLine brokenLine = new BrokenLine(vbox);
-
+        DoubleBrokenLine doubleBrokenLine = new DoubleBrokenLine(vbox);
+        doubleBrokenLine.setOnMouseClicked(new LineClickEvent());
         straightLine.setOnMouseClicked(new LineClickEvent());
         brokenLine.setOnMouseClicked(new LineClickEvent());
         leftPane.setContent(vbox);
@@ -147,16 +145,18 @@ public class LeftPaneController extends Controller {
                 case LineType.BROKEN_LINE:
                     newLine = new BrokenLine(LeftPaneController.this.getMainApp().getRightPane());
                     break;
+                case LineType.DOUBLE_BROKEN_LINE:
+                    newLine = new DoubleBrokenLine(LeftPaneController.this.getMainApp().getRightPane());
                 default:
                     break;
             }
             LeftPaneController.this.getMainApp().getRightPane().getChildren().remove(newLine);
-            if(event.getClickCount() == 1){
+            if (event.getClickCount() == 1) {
                 SymbolManage.getManage().cancelSelected();
                 getMainApp().getRightPane().getChildren().remove(newLine);
                 SymbolManage.getManage().setLeftPaneSelected(newLine);
             }
-            if(event.getClickCount() == 2){
+            if (event.getClickCount() == 2) {
                 SymbolManage.getManage().cancelSelected();
                 LeftPaneController.this.getMainApp().getRightPane().getChildren().add(newLine);
             }

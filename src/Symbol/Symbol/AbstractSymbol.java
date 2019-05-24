@@ -413,7 +413,7 @@ public abstract class AbstractSymbol extends Pane implements MShape {
         String json = mapper.writeValueAsString(getSymbolBean());
         return json;
     }
-    public void updateBeans(){
+        public void updateBeans(){
         symbolBean.setLayoutX(getLayoutX());
         symbolBean.setLayoutY(getLayoutY());
         symbolBean.setHeight(getPrefHeight());

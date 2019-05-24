@@ -2,6 +2,7 @@ package Manager;
 
 
 import Main.MainApp;
+import Symbol.Generator;
 import Util.MathUtil;
 import Symbol.GlobalConfig;
 import Symbol.Line.AbstractLine;
@@ -92,6 +93,24 @@ public class SymbolManage {
      */
     public void deleteSelectedShapeFromRightPane() {
         for (MShape mShape : selectedManager.getSelectedShape()) {
+            if(mShape.isLine()){
+                AbstractLine line = (AbstractLine) mShape;
+                mainApp.getRightPane().getChildren().remove(line.getText());
+                mainApp.getRightPane().getChildren().remove(line.getTextField());
+            }else{
+                for(Node node:mainApp.getRightPane().getChildren()){
+                    if(node instanceof AbstractLine){
+                        AbstractLine line = (AbstractLine) node;
+                        if(line.getStartConnect().getSymbol() == mShape){
+                            line.getStartConnect().unConnect();
+                        }
+
+                        if(line.getEndConnect().getSymbol() == mShape){
+                            line.getEndConnect().unConnect();
+                        }
+                    }
+                }
+            }
             mainApp.getRightPane().getChildren().remove(mShape);
         }
         selectedManager.removeAll();
@@ -116,6 +135,17 @@ public class SymbolManage {
             }
         }
     }
+
+    public AbstractSymbol[] copySelectedShapeFromRightPane() {
+        AbstractSymbol[] copySymbol = new AbstractSymbol[selectedManager.getSelectedShape().size()];
+        int i = 0;
+        for(MShape mShape : selectedManager.getSelectedShape()) {
+            AbstractSymbol as = (AbstractSymbol) mShape;
+            copySymbol[i++]=Generator.getSymbol(as.getSymbolBean());
+        }
+        return copySymbol;
+    }
+
 
     public void connect(AbstractLine line, Connect connect){
         AbstractSymbol nowSymbol = null;

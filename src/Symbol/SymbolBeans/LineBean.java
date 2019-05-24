@@ -11,6 +11,10 @@ public class LineBean {
 
     private double startY;
 
+    private double middleX;
+
+    private double middleY;
+
     private double endX;
 
     private double endY;
@@ -71,4 +75,19 @@ public class LineBean {
         this.endY = endY;
     }
 
+    public double getMiddleX() {
+        return middleX;
+    }
+
+    public void setMiddleX(double middleX) {
+        this.middleX = middleX;
+    }
+
+    public double getMiddleY() {
+        return middleY;
+    }
+
+    public void setMiddleY(double middleY) {
+        this.middleY = middleY;
+    }
 }

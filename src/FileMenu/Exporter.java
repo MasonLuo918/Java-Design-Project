@@ -26,7 +26,7 @@ public class Exporter {
         try{
             System.out.println();
             String imageType = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-            ImageIO.write(SwingFXUtils.fromFXImage(image,null),imageType,file);
+            ImageIO.write(SwingFXUtils.fromFXImage(image,null),"jpeg",file);
             dialogPane.setContentText("保存成功");
         }catch (IOException e){
             dialogPane.setContentText("保存失败");

@@ -10,11 +10,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 import javafx.scene.text.Text;
@@ -38,6 +41,10 @@ public abstract class AbstractLine extends Polyline implements MShape {
     private double lastEndX;
 
     private double lastEndY;
+
+    private double lastMiddleX;
+
+    private double lastMiddleY;
 
     private Point2D cursorPoint;
 
@@ -88,8 +95,6 @@ public abstract class AbstractLine extends Polyline implements MShape {
         textField.layoutXProperty().bind(startX);
         textField.layoutYProperty().bind(startY);
         textField.setPrefColumnCount(2);
-        text.xProperty().bind(startX);
-        text.yProperty().bind(startY.subtract(10));
         textField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -101,6 +106,73 @@ public abstract class AbstractLine extends Polyline implements MShape {
         });
     }
 
+    public void initEvent() {
+        startX.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLine();
+                drawOperationFrame();
+                updateText();
+            }
+        });
+        startY.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLine();
+                updateText();
+                drawOperationFrame();
+            }
+        });
+        endX.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLine();
+                drawOperationFrame();
+                updateText();
+            }
+        });
+        endY.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLine();
+                drawOperationFrame();
+                updateText();
+            }
+        });
+
+        middleX.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLine();
+                drawOperationFrame();
+                updateText();
+            }
+        });
+        middleY.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                updateLine();
+                drawOperationFrame();
+                updateText();
+            }
+        });
+
+
+        setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setStroke(Color.RED);
+            }
+        });
+
+        setOnMouseExited(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setStroke(Color.BLACK);
+            }
+        });
+
+    }
     @Override
     public void showOperationFrame() {
         for(Circle circle:circles){
@@ -129,6 +201,8 @@ public abstract class AbstractLine extends Polyline implements MShape {
         setUuid(bean.getUuid());
         setStartX(bean.getStartX());
         setStartY(bean.getStartY());
+        setMiddleY(bean.getMiddleY());
+        setMiddleX(bean.getMiddleX());
         setEndX(bean.getEndX());
         setEndY(bean.getEndY());
         if(!drawPane.getChildren().contains(text)){
@@ -223,11 +297,6 @@ public abstract class AbstractLine extends Polyline implements MShape {
     public void hideTextArea() {
         text.setText(textField.getText());
         drawPane.getChildren().remove(textField);
-    }
-
-    @Override
-    public void updateText() {
-
     }
 
     @Override
@@ -420,6 +489,8 @@ public abstract class AbstractLine extends Polyline implements MShape {
     public void updateBean(){
         lineBean.setStartX(getStartX());
         lineBean.setStartY(getStartY());
+        lineBean.setMiddleX(getMiddleX());
+        lineBean.setMiddleY(getMiddleY());
         lineBean.setEndX(getEndX());
         lineBean.setEndY(getEndY());
         lineBean.setLineType(getLineType());
@@ -453,6 +524,7 @@ public abstract class AbstractLine extends Polyline implements MShape {
         endBean.setStartPoint(endConnect.isStartPoint());
     }
 
+
     public void setConnectUserBean(ConnectBean bean){
         if(bean.isStartPoint()){
             startConnect.setLineXProperty(startX);
@@ -476,5 +548,21 @@ public abstract class AbstractLine extends Polyline implements MShape {
 
     public void setEndBean(ConnectBean endBean) {
         this.endBean = endBean;
+    }
+
+    public double getLastMiddleX() {
+        return lastMiddleX;
+    }
+
+    public void setLastMiddleX(double lastMiddleX) {
+        this.lastMiddleX = lastMiddleX;
+    }
+
+    public double getLastMiddleY() {
+        return lastMiddleY;
+    }
+
+    public void setLastMiddleY(double lastMiddleY) {
+        this.lastMiddleY = lastMiddleY;
     }
 }

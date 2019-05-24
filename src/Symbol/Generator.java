@@ -25,7 +25,7 @@ public class Generator {
         return symbol;
     }
 
-    private static AbstractSymbol getSymbol(SymbolBean bean) {
+    public static AbstractSymbol getSymbol(SymbolBean bean) {
         int type = bean.getSymbolType();
         AbstractSymbol symbol = null;
         switch (type) {
@@ -59,14 +59,14 @@ public class Generator {
         AbstractLine line = null;
         try {
             LineBean lineBean = mapper.readValue(json, LineBean.class);
-            line = getLine(lineBean,drawPane);
+            line = getLine(lineBean, drawPane);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return line;
     }
 
-    private static AbstractLine getLine(LineBean lineBean,Pane drawPane) {
+    public static AbstractLine getLine(LineBean lineBean, Pane drawPane) {
         int type = lineBean.getLineType();
         AbstractLine line = null;
         switch (type) {
@@ -76,6 +76,8 @@ public class Generator {
             case LineType.BROKEN_LINE:
                 line = new BrokenLine(drawPane);
                 break;
+            case LineType.DOUBLE_BROKEN_LINE:
+                line = new DoubleBrokenLine(drawPane);
             default:
                 break;
         }
@@ -83,27 +85,30 @@ public class Generator {
         return line;
     }
 
-    public static void generateConncet(String json, Pane drawPane){
+    public static void generateConncet(String json, Pane drawPane) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             ConnectBean connectBean = objectMapper.readValue(json, ConnectBean.class);
             AbstractLine line = null;
             AbstractSymbol symbol = null;
-            for(Node node:drawPane.getChildren()){
-                MShape mShape = (MShape)node;
-                if(mShape.getUuid().equals(connectBean.getLineUUID())){
+            for (Node node : drawPane.getChildren()) {
+                if(!(node instanceof MShape)){
+                    continue;
+                }
+                MShape mShape = (MShape) node;
+                if (mShape.getUuid().equals(connectBean.getLineUUID())) {
                     line = (AbstractLine) mShape;
                 }
-                if(mShape.getUuid().equals(connectBean.getSymbolUUID())){
+                if (mShape.getUuid().equals(connectBean.getSymbolUUID())) {
                     symbol = (AbstractSymbol) mShape;
                 }
             }
-            if(line != null && symbol != null){
-                if(connectBean.isStartPoint()){
+            if (line != null && symbol != null) {
+                if (connectBean.isStartPoint()) {
                     line.getStartConnect().setCircleIndex(connectBean.getCircleIndex());
                     line.getStartConnect().setSymbol(symbol);
                     line.getStartConnect().connect();
-                }else{
+                } else {
                     line.getEndConnect().setCircleIndex(connectBean.getCircleIndex());
                     line.getEndConnect().setSymbol(symbol);
                     line.getEndConnect().connect();

@@ -101,7 +101,8 @@ public class MenuBarController extends Controller {
             public void handle(ActionEvent event) {
                 FileChooser fileChoose = new FileChooser();
                 fileChoose.getExtensionFilters().addAll(
-                        new FileChooser.ExtensionFilter("png图片","*.png")
+                        new FileChooser.ExtensionFilter("png图片","*.png"),
+                        new FileChooser.ExtensionFilter("jpg图片","*.jpg")
                 );
                     File file = fileChoose.showSaveDialog(stage);
                     if(file!=null){

@@ -44,53 +44,6 @@ public class StraightLine extends AbstractLine {
     }
 
     @Override
-    public void initEvent() {
-        startX.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateLine();
-                drawOperationFrame();
-            }
-        });
-        startY.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateLine();
-                drawOperationFrame();
-            }
-        });
-        endX.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateLine();
-                drawOperationFrame();
-            }
-        });
-        endY.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateLine();
-                drawOperationFrame();
-            }
-        });
-
-        setOnMouseEntered(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                setStroke(Color.RED);
-            }
-        });
-
-        setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                setStroke(Color.BLACK);
-            }
-        });
-
-    }
-
-    @Override
     public void initOperationFrameEvent() {
         getCircles()[0].setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
@@ -146,6 +99,12 @@ public class StraightLine extends AbstractLine {
             }
         });
 
+    }
+
+    @Override
+    public void updateText() {
+        getText().setX((getStartX() + getEndX()) / 2);
+        getText().setY((getStartY() + getEndY()) / 2 - 10);
     }
 
     @Override
