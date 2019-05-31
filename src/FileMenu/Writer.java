@@ -1,10 +1,8 @@
 package FileMenu;
 
-import Main.MainApp;
 import Symbol.Line.AbstractLine;
 import Symbol.MShape;
 import Symbol.Symbol.AbstractSymbol;
-import Test.Main;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,7 +42,6 @@ public class Writer{
         root.set("lines",lineArray);
         root.set("connects",connectArray);
         String string = mapper.writeValueAsString(root);
-//        System.out.println(string);
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         fileOutputStream.write(string.getBytes());
         fileOutputStream.close();

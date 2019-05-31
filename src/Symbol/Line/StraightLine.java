@@ -98,7 +98,6 @@ public class StraightLine extends AbstractLine {
                 SymbolManage.getManage().getConnectManager().removeAllConnectSymbol();
             }
         });
-
     }
 
     @Override

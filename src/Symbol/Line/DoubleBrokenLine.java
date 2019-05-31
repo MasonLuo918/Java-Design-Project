@@ -3,6 +3,8 @@ package Symbol.Line;
 import Manager.SymbolManage;
 import Symbol.GlobalConfig;
 import Util.MathUtil;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -38,6 +40,19 @@ public class DoubleBrokenLine extends AbstractLine {
         initEvent();
         initOperationFrameEvent();
         drawPane.getChildren().add(this);
+        middleXProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                drawOperationFrame();
+            }
+        });
+
+        middleYProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                drawOperationFrame();
+            }
+        });
     }
 
     @Override

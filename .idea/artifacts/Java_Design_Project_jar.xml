@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Java Design Project:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Java_Design_Project_jar</output-path>
+    <root id="archive" name="Java Design Project.jar">
+      <element id="module-output" name="Java Design Project" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/jackjson/jackson-core-2.9.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/jackjson/jackson-annotations-2.9.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/jackjson/jackson-databind-2.9.8.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

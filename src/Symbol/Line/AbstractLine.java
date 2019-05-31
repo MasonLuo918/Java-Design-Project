@@ -143,6 +143,7 @@ public abstract class AbstractLine extends Polyline implements MShape {
         middleX.addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                System.out.println("***");
                 updateLine();
                 drawOperationFrame();
                 updateText();

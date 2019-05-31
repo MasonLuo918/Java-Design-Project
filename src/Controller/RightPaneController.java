@@ -4,6 +4,7 @@ import Main.MainApp;
 import Manager.SymbolManage;
 import Symbol.*;
 import Symbol.Line.AbstractLine;
+import Symbol.Line.DoubleBrokenLine;
 import Symbol.Line.LineType;
 import Symbol.Symbol.AbstractSymbol;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,7 +17,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
 
 
@@ -197,7 +197,12 @@ public class RightPaneController extends Controller {
                             line.setStartY(newStartY);
                             line.setEndX(newEndX);
                             line.setEndY(newEndY);
-                            if (line.getLineType() == LineType.DOUBLE_BROKEN_LINE) {
+                            if (line.getLineType() == LineType.DOUBLE_BROKEN_LINE || line.getLineType() == LineType.DOUBLE_BROKEN_LINE) {
+                                line.setMiddleX(newMiddleX);
+                                line.setMiddleY(newMiddleY);
+                            }
+                        }else{
+                            if(line instanceof DoubleBrokenLine){
                                 line.setMiddleX(newMiddleX);
                                 line.setMiddleY(newMiddleY);
                             }
@@ -222,7 +227,6 @@ public class RightPaneController extends Controller {
 
                             RightPaneController.this.rightPane.getChildren().add(each);
                             RightPaneController.this.point = RightPaneController.this.copySymbol[0].sceneToParent(x, y);
-
 
                             each.setLayoutX(RightPaneController.this.point.getX());
                             each.setLayoutY(RightPaneController.this.point.getY());
